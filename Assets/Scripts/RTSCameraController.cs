@@ -1,10 +1,7 @@
-﻿//using System.Collections;
-//using System.Collections.Generic;
-using System;
+﻿
 using UnityEngine;
-//using UnityEngine.Scripting.APIUpdating;
 
-public class CustomCameraController : MonoBehaviour
+public class RTSCameraController : MonoBehaviour
 {
     class CameraState
     {
@@ -53,7 +50,7 @@ public class CustomCameraController : MonoBehaviour
     [Tooltip("Target distance to maintain from ground (or other object directly below the camera)")]
     public float targetDistanceFromGround = 50.0f;
 
-    [Tooltip("Slows the vertical motion to help prevent some wacky jiggling")]
+    [Tooltip("Slows the vertical movement speed")]
     public float groundDistanceDamping = 0.1f;
 
     public const float maxDistanceFromGround = 100.0f;
