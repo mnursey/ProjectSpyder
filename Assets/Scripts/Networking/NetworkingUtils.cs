@@ -39,11 +39,52 @@ public static class NetworkingMessageTranslator
         return JsonUtility.ToJson(obj);
     }
 
-    public static byte[] GenerateGameStateNetworkingMessage(GameState gs)
+    public static byte[] GenerateGameStateNetworkingMessage(GameState gs, int frame)
     {
         NetworkingMessage nm = new NetworkingMessage();
         nm.type = NetworkingMessageType.GAME_STATE;
         nm.content = ToByteArray(gs);
+        nm.frame = frame;
+
+        return ToByteArray(nm);
+    }
+
+    public static byte[] GenerateEntityStateNetworkingMessage(List<EntityState> es, int frame)
+    {
+        NetworkingMessage nm = new NetworkingMessage();
+        nm.type = NetworkingMessageType.ENTITY_STATE;
+        nm.content = ToByteArray(es);
+        nm.frame = frame;
+
+        return ToByteArray(nm);
+    }
+
+    public static byte[] GenerateEntityDataNetworkingMessage(List<EntityData> ed, int frame)
+    {
+        NetworkingMessage nm = new NetworkingMessage();
+        nm.type = NetworkingMessageType.ENTITY_DATA;
+        nm.content = ToByteArray(ed);
+        nm.frame = frame;
+
+        return ToByteArray(nm);
+    }
+
+    public static byte[] GeneratePlayerStateNetworkingMessage(List<PlayerState> ps, int frame)
+    {
+        NetworkingMessage nm = new NetworkingMessage();
+        nm.type = NetworkingMessageType.PLAYER_STATE;
+        nm.content = ToByteArray(ps);
+        nm.frame = frame;
+
+        return ToByteArray(nm);
+    }
+
+    public static byte[] GeneratePlayerDataNetworkingMessage(List<PlayerData> pd, int frame)
+    {
+        NetworkingMessage nm = new NetworkingMessage();
+        nm.type = NetworkingMessageType.PLAYER_DATA;
+        nm.content = ToByteArray(pd);
+        nm.frame = frame;
 
         return ToByteArray(nm);
     }
@@ -63,6 +104,7 @@ public class NetworkingMessage
     public NetworkingMessageType type;
     public byte[] content;
     public UInt32 clientID;
+    public int frame;
 
     public NetworkingMessage()
     {
@@ -107,14 +149,21 @@ public class SVector3
 [Serializable]
 public class GameState
 {
-    public string data;
+    public GameStateEnum state;
+    public float zoneSize;
 
     public GameState () {
 
     }
 
-    public GameState(string state)
+    public GameState(GameStateEnum state)
     {
-        data = state;
+        this.state = state;
+    }
+
+    public GameState(GameStateEnum state, float zoneSize)
+    {
+        this.state = state;
+        this.zoneSize = zoneSize;
     }
 }

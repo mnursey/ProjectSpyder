@@ -157,7 +157,7 @@ public class ServerController : MonoBehaviour
 
                     GameState gs = (GameState)NetworkingMessageTranslator.ByteArrayToObject(msg.content);
 
-                    Debug.Log("Server recieved game state: " + gs.data);
+                    Debug.Log("Server recieved game state: " + gs.state);
 
                     break;
             }

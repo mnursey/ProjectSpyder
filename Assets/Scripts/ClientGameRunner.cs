@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-enum GameStateEnum { IDLE, JOINING, WAITING, PLAYING, ENDING }
+public enum GameStateEnum { IDLE, JOINING, WAITING, PLAYING, ENDING }
 
 public class ClientGameRunner : MonoBehaviour
 {
@@ -10,6 +10,19 @@ public class ClientGameRunner : MonoBehaviour
     ClientController cc;
 
     GameStateEnum state;
+
+    int lastEntityDataUpdateFrame = 0;
+    int lastPlayerDataUpdateFrame = 0;
+
+    int lastEntityStateUpdateFrame = 0;
+    int lastPlayerStateUpdateFrame = 0;
+    int lastGameStateUpdateFrame = 0;
+
+    GameState incomingGameState;
+    List<PlayerState> incomingPlayerState;
+    List<PlayerData> incomingPlayerData;
+    List<EntityState> incomingEntityState;
+    List<EntityData> incomingEntityData;
 
     // Start is called before the first frame update
     void Start()
@@ -21,6 +34,8 @@ public class ClientGameRunner : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        UpdateGameState();
+
         switch(state)
         {
             // Used for main menu
@@ -38,10 +53,12 @@ public class ClientGameRunner : MonoBehaviour
             // Used when playing game... Dead or alive
             case GameStateEnum.PLAYING:
 
+                UpdateEntities();
+                UpdatePlayers();
+
                 // TODO
                 // CAMERA
                 // SEND COMMANDS
-                // UPDATE GAME STATE / VISUALS
 
                 break;
 
@@ -81,27 +98,62 @@ public class ClientGameRunner : MonoBehaviour
         // TODO
     }
 
-    public void SetEntityState()
+    public void ReceiveEntityState(List<EntityState> es, int frame)
+    {
+        if(incomingEntityState == null || lastEntityStateUpdateFrame < frame)
+        {
+            lastEntityStateUpdateFrame = frame;
+            incomingEntityState = es;
+        }
+    }
+
+    public void ReceivePlayerState(List<PlayerState> ps, int frame)
+    {
+        if (incomingPlayerState == null || lastPlayerStateUpdateFrame < frame)
+        {
+            lastPlayerStateUpdateFrame = frame;
+            incomingPlayerState = ps;
+        }
+    }
+
+    public void ReceiveGameState(GameState gs, int frame)
+    {
+        if (incomingGameState == null || lastGameStateUpdateFrame < frame)
+        {
+            lastGameStateUpdateFrame = frame;
+            incomingGameState = gs;
+        }
+    }
+
+    public void ReceiveEntityData(List<EntityData> ed, int frame)
+    {
+        if (incomingEntityData == null || lastEntityDataUpdateFrame < frame)
+        {
+            lastEntityDataUpdateFrame = frame;
+            incomingEntityData = ed;
+        }
+    }
+
+    public void ReceivePlayerData(List<PlayerData> pd, int frame)
+    {
+        if (incomingPlayerData == null || lastPlayerDataUpdateFrame < frame)
+        {
+            lastPlayerDataUpdateFrame = frame;
+            incomingPlayerData = pd;
+        }
+    }
+
+    public void UpdateEntities()
     {
         // TODO
     }
 
-    public void SetPlayerState()
+    public void UpdatePlayers()
     {
         // TODO
     }
 
-    public void SetGameState()
-    {
-        // TODO
-    }
-
-    public void UpdateEntityState()
-    {
-        // TODO
-    }
-
-    public void UpdatePlayerState()
+    public void UpdateGameState()
     {
         // TODO
     }
@@ -109,5 +161,18 @@ public class ClientGameRunner : MonoBehaviour
     public void ResetGame()
     {
         em.Reset();
+
+        lastEntityStateUpdateFrame = 0;
+        lastPlayerStateUpdateFrame = 0;
+        lastGameStateUpdateFrame = 0;
+
+        lastEntityDataUpdateFrame = 0;
+        lastPlayerDataUpdateFrame = 0;
+
+        incomingGameState = null;
+        incomingPlayerState = null;
+        incomingPlayerData = null;
+        incomingEntityState = null;
+        incomingEntityData = null;
     }
 }
