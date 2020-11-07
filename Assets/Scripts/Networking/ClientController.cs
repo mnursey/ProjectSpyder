@@ -17,14 +17,9 @@ public enum ClientState { IDLE, CONNECTING, CONNECTED, DISCONNECTING, ERROR };
 public delegate void OnConnect(bool connected);
 public delegate void OnDisconnect();
 public delegate void OnReject(string reason);
-public delegate void OnAccountCreate(ulong accountID, int accountType);
-public delegate void OnLogin(AccountData ac);
-public delegate void OnGlobalLeaderboardData(List<AccountData> ad);
 
 public class ClientController : MonoBehaviour
 {
-    public string version = "0.01";
-
     public string serverIP;
     public ushort serverport = 10069;
 
@@ -36,7 +31,6 @@ public class ClientController : MonoBehaviour
     public OnConnect onConnect;
     public OnDisconnect onDisconnect;
     public OnReject onReject;
-    public OnGlobalLeaderboardData onGLD;
 
     public static ClientController Instance;
 
@@ -63,14 +57,13 @@ public class ClientController : MonoBehaviour
 
     }
 
-    public void ConnectToServer(string username, ulong accountID, int accountType, OnConnect onConnect, OnDisconnect onDisconnect, OnReject onReject, OnGlobalLeaderboardData onGlobalLeaderboardData)
+    public void ConnectToServer(string username, OnConnect onConnect, OnDisconnect onDisconnect, OnReject onReject)
     {
         Debug.Log("Creating new client");
 
         this.onConnect = onConnect;
         this.onDisconnect = onDisconnect;
         this.onReject = onReject;
-        this.onGLD = onGlobalLeaderboardData;
 
         utils = new NetworkingUtils();
         utils.SetDebugCallback(DebugType.Message, debug);
@@ -89,7 +82,7 @@ public class ClientController : MonoBehaviour
         connection = client.Connect(ref address);
     }
 
-    public void JoinGame(string username, ulong accountID, int accountType, OnConnect onConnect, OnDisconnect onDisconnect, OnReject onReject, OnAccountCreate onAccountCreate, OnLogin onLogin, OnGlobalLeaderboardData onGlobalLeaderboardData)
+    public void JoinGame(string username, OnConnect onConnect, OnDisconnect onDisconnect, OnReject onReject)
     {
         this.onConnect = (bool connected) => {
             this.onConnect = onConnect;
@@ -104,22 +97,7 @@ public class ClientController : MonoBehaviour
             }
         };
 
-        ConnectToServer(username, accountID, accountType, this.onConnect, onDisconnect, onReject, onGlobalLeaderboardData);
-    }
-
-    public void GetGlobalLeaderboard(OnGlobalLeaderboardData onGLD)
-    {
-        // Todo handle failed to connect
-        this.onConnect = (bool connected) => {
-            //if (connected)
-                //Send(NetworkingMessageTranslator.GenerateGlobalLeaderboardMessage(), SendFlags.Reliable, null);
-        };
-
-        this.onDisconnect = null;
-        this.onReject = null;
-        this.onGLD = onGLD;
-
-        ConnectToServer("", 0, 0, this.onConnect, this.onDisconnect, this.onReject, this.onGLD);
+        ConnectToServer(username, this.onConnect, onDisconnect, onReject);
     }
 
     [MonoPInvokeCallback(typeof(StatusCallback))]
@@ -177,15 +155,11 @@ public class ClientController : MonoBehaviour
 
             switch(msg.type)
             {
-                case NetworkingMessageType.SERVER_JOIN_RESPONSE:
-
-                    break;
-
-                case NetworkingMessageType.GLOBAL_LEADERBOARD:
-
-                    break;
-
                 case NetworkingMessageType.GAME_STATE:
+
+                    GameState gs = (GameState)NetworkingMessageTranslator.ByteArrayToObject(msg.content);
+
+                    Debug.Log("Client recieved game state: " + gs.data);
 
                     break;
             }
@@ -194,11 +168,8 @@ public class ClientController : MonoBehaviour
         {
             Debug.LogWarning(ex.ToString());
         }
-
-        //Debug.Log(result);
     }
 
-    // Update is called once per frame
     void Update()
     {
         Receive();
