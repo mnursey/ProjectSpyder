@@ -17,7 +17,6 @@ public enum DisconnectionReason { NONE, ERROR, SERVER_CLOSED, SERVER_FULL, KICKE
 
 public class ServerController : MonoBehaviour
 {
-    public string version = "0.1";
     public ushort port = 10069;
 
     private StatusCallback status;
@@ -31,12 +30,13 @@ public class ServerController : MonoBehaviour
 
     public bool acceptingClients = true;
     public int maxConnections = 100;
-    public int maxPlayers = 20;
 
     public static ServerController Instance;
 
     const int maxMessages = 40;
     Valve.Sockets.NetworkingMessage[] netMessages = new Valve.Sockets.NetworkingMessage[maxMessages];
+
+    ServerGameRunner sgr;
 
     DebugCallback debug = (type, message) => {
         Debug.Log("Networking Debug - Type: " + type + ", Message: " + message);
@@ -45,6 +45,8 @@ public class ServerController : MonoBehaviour
 
     void Awake()
     {
+        sgr = GetComponent<ServerGameRunner>();
+
         Library.Initialize();
 
         Debug.Log("Initialized ValveSockets");
@@ -93,7 +95,11 @@ public class ServerController : MonoBehaviour
                     Debug.Log("Server Accept connection result " + r.ToString());
                     //server.SetConnectionPollGroup(connectedPollGroup, info.connection);
                     Instance.connectedClients.Add(info.connection);
-                } else
+
+                    // Add to player manager
+                    Instance.sgr.pm.AddPlayer(info.connection);
+                }
+                else
                 {
                     Instance.server.CloseConnection(info.connection, (int)DisconnectionReason.SERVER_FULL, "Server full.", false);
                 }
@@ -122,6 +128,10 @@ public class ServerController : MonoBehaviour
 
                 Instance.RemoveClient(info.connection, reason, closeDebug);
                 Debug.Log(String.Format("Client disconnected from server - ID: {0}, IP: {1}", info.connection, info.connectionInfo.address.GetIP()));
+
+                // Remove from player manager
+                Instance.sgr.pm.RemovePlayer(info.connection);
+
                 break;
         }
     }
@@ -143,17 +153,11 @@ public class ServerController : MonoBehaviour
 
             switch(msg.type)
             {
-                case NetworkingMessageType.CLIENT_JOIN:
+                case NetworkingMessageType.GAME_STATE:
 
+                    GameState gs = (GameState)NetworkingMessageTranslator.ByteArrayToObject(msg.content);
 
-                    break;
-
-                case NetworkingMessageType.INPUT_STATE:
-
-
-                    break;
-
-                case NetworkingMessageType.GLOBAL_LEADERBOARD:
+                    Debug.Log("Server recieved game state: " + gs.data);
 
                     break;
             }
@@ -162,8 +166,6 @@ public class ServerController : MonoBehaviour
         {
             Debug.LogWarning(ex.ToString());
         }
-
-        // Debug.Log(result);
     }
 
     public void SendTo(UInt32 connectionID, string data, SendFlags flags)
@@ -191,10 +193,9 @@ public class ServerController : MonoBehaviour
     {
         if (ServerActive())
         {
-            // TODO FIX THIS... not new list duh!
-            foreach (UInt32 connectedId in new List<UInt32>())
+            foreach (Player player in sgr.pm.players)
             {
-                SendTo(connectedId, data, flags);
+                SendTo(player.id, data, flags);
             }
         }
     }
@@ -215,6 +216,13 @@ public class ServerController : MonoBehaviour
     void Update()
     {
         Receive();
+
+        // TEST
+        /*
+        GameState gs = new GameState("Server Game State");
+        byte[] data = NetworkingMessageTranslator.GenerateGameStateNetworkingMessage(gs);
+        SendToAll(data, SendFlags.Reliable);
+        */
     }
 
     void Receive()
