@@ -11,9 +11,21 @@ public class VehicleAI : MonoBehaviour
     public float accelerationInput = 0.0f;
     public float brakingInput = 0.0f;
 
+    [Header("AI Parameters")]
+    public float nodeRadius = 1;
+    public float turnDamping = 1;
+    public float accelPrudence = 1;
+    public float maxSpeed = 5;
+
     public bool manualControl;
 
-    List<Vector2> nodes = new List<Vector2>();
+    public List<Vector2> nodes = new List<Vector2>();
+
+    void Start(){
+    	if(!rb){
+    		rb = GetComponent<Rigidbody>();
+    	}
+    }
 
     public void UpdateInputs(){
     	if(manualControl){
@@ -23,10 +35,26 @@ public class VehicleAI : MonoBehaviour
     	if(nodes.Count == 0){
     		BrakeIfMoving();
     	}else{
-    		Vector2 planePos = new Vector2(transform.position.x, transform.position.z);
+    		Vector2 planePos = transform.position.DiscardY();
     		Vector2 nodePos = nodes[0];
 
-    		//nextNodeAngle = Vector2.SignedAngle((Vector2)transform.forward, nodePos - planePos);
+    		if((planePos - nodePos).magnitude < nodeRadius){
+    			nodes.RemoveAt(0);
+    			ClearInputs();
+
+    		}else{
+	    		//Negative angle means turn right, positive means turn left
+	    		float nextNodeAngle = Mathf.Deg2Rad * Vector2.SignedAngle(transform.forward.DiscardY(), nodePos - planePos);
+	    		float alignment = Mathf.Cos(nextNodeAngle);
+	    		int turnDirection =  -(int)Mathf.Sign(nextNodeAngle);
+
+	    		steeringInput = Mathf.Pow(Mathf.Min(1-alignment, 1), turnDamping) * turnDirection;
+
+	    		//if(rb.velocity.mag)
+	    		accelerationInput = Mathf.Pow(Mathf.Max(alignment, 0), accelPrudence);
+	    	}
+
+
 
 
     	}

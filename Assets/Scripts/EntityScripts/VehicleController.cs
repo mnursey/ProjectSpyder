@@ -8,6 +8,9 @@ class VehicleController : MonoBehaviour {
 
 	public Rigidbody rb;
 	public Vector3 centerOfMass = Vector3.zero;
+
+	public VehicleAI inputs;
+
 	public Axle[] axles = new Axle[2];
 
 	public Axle frontAxle{
@@ -19,11 +22,6 @@ class VehicleController : MonoBehaviour {
 		get{ return axles[Axle.REAR_AXLE_INDEX]; }
 		set{ axles[Axle.REAR_AXLE_INDEX] = value; }
 	}
-
-	[Header("Car Inputs")]
-    public float steeringInput = 0.0f;
-    public float accelerationInput = 0.0f;
-    public float brakingInput = 0.0f;
 
 	[Header("Car Performance")]
 
@@ -42,10 +40,13 @@ class VehicleController : MonoBehaviour {
 	public float stoppedThreshold = 0.1f;
 
 
+	void Start(){
+    	if(!rb) rb = GetComponent<Rigidbody>();
+    	if(!inputs) inputs = GetComponent<VehicleAI>();
+    }
+
 	void Update(){
-		steeringInput = Input.GetAxis("Horizontal");
-		accelerationInput = Mathf.Max(Input.GetAxis("Vertical"), 0);
-		brakingInput = Mathf.Max(-Input.GetAxis("Vertical"), 0);
+		inputs.UpdateInputs();
 	}
 
 	public void Reset(){
@@ -172,12 +173,12 @@ class VehicleController : MonoBehaviour {
             // Refactor this and remove the divide by 4. First count number of braking wheels on all axis
             if (axle.leftWheel.isGrounded)
             {
-                rb.AddForce(-transform.forward * brakingPower * Time.deltaTime * brakingInput / (2*axles.Length), ForceMode.Acceleration);
+                rb.AddForce(-transform.forward * brakingPower * Time.deltaTime * inputs.brakingInput / (2*axles.Length), ForceMode.Acceleration);
             }
 
             if (axle.rightWheel.isGrounded)
             {
-                rb.AddForce(-transform.forward * brakingPower * Time.deltaTime * brakingInput / (2*axles.Length), ForceMode.Acceleration);
+                rb.AddForce(-transform.forward * brakingPower * Time.deltaTime * inputs.brakingInput / (2*axles.Length), ForceMode.Acceleration);
             }
         }
     }
@@ -192,12 +193,12 @@ class VehicleController : MonoBehaviour {
                 // Refactor this and remove the divide by 2. First count number of powered wheels on all axis
                 if(axle.leftWheel.isGrounded)
                 {
-                    rb.AddForce(transform.forward * enginePower * Time.deltaTime * accelerationInput / 2,  ForceMode.Acceleration);
+                    rb.AddForce(transform.forward * enginePower * Time.deltaTime * inputs.accelerationInput / 2,  ForceMode.Acceleration);
                 }
 
                 if (axle.rightWheel.isGrounded)
                 {
-                    rb.AddForce(transform.forward * enginePower * Time.deltaTime * accelerationInput / 2,  ForceMode.Acceleration);
+                    rb.AddForce(transform.forward * enginePower * Time.deltaTime * inputs.accelerationInput / 2,  ForceMode.Acceleration);
                 }
             }
         }
@@ -209,12 +210,12 @@ class VehicleController : MonoBehaviour {
 
         if (axle.leftWheel.isGrounded)
         {
-            rb.AddForceAtPosition(transform.right * steeringPower * Time.deltaTime * steeringInput / 2, FixToCarCentre(WheelPosition(axle, axle.rightWheel)), ForceMode.Acceleration);
+            rb.AddForceAtPosition(transform.right * steeringPower * Time.deltaTime * inputs.steeringInput / 2, FixToCarCentre(WheelPosition(axle, axle.rightWheel)), ForceMode.Acceleration);
         }
 
         if (axle.rightWheel.isGrounded)
         {
-            rb.AddForceAtPosition(transform.right * steeringPower * Time.deltaTime * steeringInput / 2, FixToCarCentre(WheelPosition(axle, axle.rightWheel)), ForceMode.Acceleration);
+            rb.AddForceAtPosition(transform.right * steeringPower * Time.deltaTime * inputs.steeringInput / 2, FixToCarCentre(WheelPosition(axle, axle.rightWheel)), ForceMode.Acceleration);
         }
     }
 
