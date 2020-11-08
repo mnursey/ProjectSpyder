@@ -7,7 +7,6 @@ using System.Collections.Generic;
 class VehicleController : MonoBehaviour {
 
 	public Rigidbody rb;
-	public Vector3 centerOfMass = Vector3.zero;
 
 	public VehicleAI inputs;
 
@@ -33,6 +32,8 @@ class VehicleController : MonoBehaviour {
 	[Header("Other")]
 
 	public float resetHeight;
+	public float centerOfMassYOffset;
+	public bool canDriveOnEntities;
 
 	Vector3 previousFramePosition;
 
@@ -49,7 +50,7 @@ class VehicleController : MonoBehaviour {
     	if(!rb) rb = GetComponent<Rigidbody>();
     	if(!inputs) inputs = GetComponent<VehicleAI>();
 
-    	rb.centerOfMass = new Vector3(0, rb.centerOfMass.y, (frontAxle.offset.x + rearAxle.offset.x)/2);
+    	rb.centerOfMass = new Vector3(0, rb.centerOfMass.y + centerOfMassYOffset, (frontAxle.offset.x + rearAxle.offset.x)/2);
     }
 
 	void Update(){
@@ -92,7 +93,7 @@ class VehicleController : MonoBehaviour {
 
         RaycastHit hit;
 
-        int layerMask = ~LayerMask.GetMask("Entities", "Water");
+        int layerMask = canDriveOnEntities ? ~LayerMask.GetMask("Water") : LayerMask.GetMask("Terrain");
         bool hitSomething = Physics.Raycast(compressedWheelPos, -transform.up, out hit, axle.suspensionHeight, layerMask, QueryTriggerInteraction.Ignore);
 
         Debug.DrawLine(compressedWheelPos, compressedWheelPos - (transform.up * axle.suspensionHeight), Color.green);
