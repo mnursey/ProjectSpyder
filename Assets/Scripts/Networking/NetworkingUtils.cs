@@ -89,6 +89,24 @@ public static class NetworkingMessageTranslator
         return ToByteArray(nm);
     }
 
+    public static byte[] GenerateClientIDNetworkingMessage(uint id)
+    {
+        NetworkingMessage nm = new NetworkingMessage();
+        nm.type = NetworkingMessageType.SERVER_SEND_ID;
+        nm.content = ToByteArray(id);
+
+        return ToByteArray(nm);
+    }
+
+    public static byte[] GenerateUsernameNetworkingMessage(string username)
+    {
+        NetworkingMessage nm = new NetworkingMessage();
+        nm.type = NetworkingMessageType.CLIENT_USERNAME;
+        nm.content = ToByteArray(username);
+
+        return ToByteArray(nm);
+    }
+
     public static NetworkingMessage ParseMessage(byte[] data)
     {
         return (NetworkingMessage)ByteArrayToObject(data);
@@ -96,7 +114,7 @@ public static class NetworkingMessageTranslator
 }
 
 [Serializable]
-public enum NetworkingMessageType { ENTITY_STATE, PLAYER_STATE, GAME_STATE, ENTITY_DATA, PLAYER_DATA, USER_COMMANDS };
+public enum NetworkingMessageType { ENTITY_STATE, PLAYER_STATE, GAME_STATE, ENTITY_DATA, PLAYER_DATA, USER_COMMANDS, CLIENT_USERNAME, SERVER_SEND_ID };
 
 [Serializable]
 public class NetworkingMessage

@@ -3,6 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum EntityType { SOLDIER, JEEP, MG_JEEP, TANK, ANTI_TANK, MED_TRUCK, RAM_TRUCK, MECH, BUNKER, SHIELD_TANK};
+
+public enum EntityManagerMode { CLIENT, SERVER };
+
 public class EntityManager : MonoBehaviour
 {
     public ushort idCounter = 0;
@@ -12,6 +16,8 @@ public class EntityManager : MonoBehaviour
     public List<GameObject> entityPrefabs = new List<GameObject>();
 
     public static EntityManager Instance;
+
+    public EntityManagerMode mode;
 
     public void Awake()
     {
@@ -41,15 +47,40 @@ public class EntityManager : MonoBehaviour
         return entities.Find(x => x.id == id);
     }
 
-    public IEntity CreateEntity(ushort entityPrefabIndex)
+    void DisableServerSideEntityLogic(GameObject g)
+    {
+        foreach(Rigidbody r in g.GetComponentsInChildren<Rigidbody>())
+        {
+            r.isKinematic = true;
+        }
+
+        foreach (VehicleController vc in g.GetComponentsInChildren<VehicleController>())
+        {
+            vc.enabled = false;
+        }
+
+        foreach (VehicleAI va in g.GetComponentsInChildren<VehicleAI>())
+        {
+            va.enabled = false;
+        }
+    }
+
+    public IEntity CreateEntity(EntityType type)
     {
         IEntity entity = new GenericEntity();
-        entity.entityPrefabIndex = entityPrefabIndex;
+        entity.entityPrefabIndex = (ushort)type;
 
         entity.id = ++idCounter;
 
-        GameObject g = Instantiate(entityPrefabs[entityPrefabIndex]);
+        GameObject g = Instantiate(entityPrefabs[(ushort)type]);
         entity.gameObject = g;
+
+        entities.Add(entity);
+
+        if(mode == EntityManagerMode.CLIENT)
+        {
+            DisableServerSideEntityLogic(g);
+        }
 
         return entity;
     }
@@ -66,6 +97,13 @@ public class EntityManager : MonoBehaviour
 
         g.transform.position = ed.pos.GetValue();
         g.transform.eulerAngles = ed.rot.GetValue();
+
+        entities.Add(entity);
+
+        if (mode == EntityManagerMode.CLIENT)
+        {
+            DisableServerSideEntityLogic(g);
+        }
 
         return entity;
     }
@@ -93,6 +131,11 @@ public class EntityManager : MonoBehaviour
         UpdateEntity(GetEntity(ed.id), ed);
     }
 
+    public void UpdateEntity(EntityState es)
+    {
+        UpdateEntity(GetEntity(es.id), es);
+    }
+
     public void UpdateEntity(IEntity entity, EntityData ed)
     {
         IEntity e = GetEntity(ed.id);
@@ -108,6 +151,17 @@ public class EntityManager : MonoBehaviour
         }
     }
 
+    public void UpdateEntity(IEntity entity, EntityState es)
+    {
+        IEntity e = GetEntity(es.id);
+        if (e != null)
+        {
+            // Update entity
+            e.gameObject.transform.position = es.pos.GetValue();
+            e.gameObject.transform.eulerAngles = es.rot.GetValue();
+        }
+    }
+
     public List<EntityState> GetState()
     {
         List<EntityState> data = new List<EntityState>();
@@ -120,11 +174,11 @@ public class EntityManager : MonoBehaviour
         return data;
     }
 
-    public void SetState(List<EntityData> data)
+    public void SetState(List<EntityState> state)
     {
-        foreach(EntityData ed in data)
+        foreach(EntityState es in state)
         {
-            UpdateEntity(ed);
+            UpdateEntity(es);
         } 
     }
 
@@ -138,6 +192,14 @@ public class EntityManager : MonoBehaviour
         }
 
         return data;
+    }
+
+    public void SetData(List<EntityData> data)
+    {
+        foreach (EntityData ed in data)
+        {
+            UpdateEntity(ed);
+        }
     }
 }
 

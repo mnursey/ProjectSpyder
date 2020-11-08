@@ -7,6 +7,11 @@ public class PlayerManager : MonoBehaviour
 {
     public List<Player> players = new List<Player>();
 
+    public void Reset()
+    {
+        players = new List<Player>();
+    }
+
     public Player GetPlayer(uint id)
     {
         return players.Find(x => x.id == id);
@@ -14,12 +19,25 @@ public class PlayerManager : MonoBehaviour
 
     public void AddPlayer(uint id)
     {
-
+        players.Add(new Player(id));
     }
 
     public void RemovePlayer(uint id)
     {
+        Player p = GetPlayer(id);
+        if(p != null)
+        {
+            players.Remove(p);
+        }
+    }
 
+    public void UpdateUsername(uint id, string username)
+    {
+        Player p = GetPlayer(id);
+        if (p != null)
+        {
+            p.username = username;
+        }
     }
 
     public int GetPlayerCount()
@@ -29,8 +47,8 @@ public class PlayerManager : MonoBehaviour
 
     public int GetPlayingPlayerCount()
     {
-        // If waiting they have no entities to control
-        // If playing they have entities to control
+        // If they have no entities to control then they are waiting
+        // If they have entities to control then playing
         int count = 0;
 
         foreach(Player p in players)
@@ -99,11 +117,11 @@ public class Player {
     public uint id;
     public string username;
 
-    public List<int> controlledEntities;
+    public List<int> controlledEntities = new List<int>();
 
-    public Player()
+    public Player(uint id)
     {
-
+        this.id = id;
     }
 
     public Player(PlayerData pd)

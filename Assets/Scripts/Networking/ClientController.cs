@@ -34,6 +34,8 @@ public class ClientController : MonoBehaviour
 
     public static ClientController Instance;
 
+    ClientGameRunner cgr;
+
     const int maxMessages = 40;
     Valve.Sockets.NetworkingMessage[] netMessages = new Valve.Sockets.NetworkingMessage[maxMessages];
 
@@ -50,6 +52,8 @@ public class ClientController : MonoBehaviour
         Library.Initialize();
 
         Debug.Log("Initialized ValveSockets");
+
+        cgr = GetComponent<ClientGameRunner>();
     }
 
     void Start()
@@ -89,8 +93,7 @@ public class ClientController : MonoBehaviour
 
             if (connected)
             {
-                // Todo
-                // Send username
+                onConnect?.Invoke(connected);
             }
             else
             {
@@ -154,6 +157,8 @@ public class ClientController : MonoBehaviour
         {
             NetworkingMessage msg = NetworkingMessageTranslator.ParseMessage(messageDataBuffer);
 
+            Debug.Log("Got " + msg.type + " " + msg.content.Length);
+
             switch(msg.type)
             {
                 case NetworkingMessageType.GAME_STATE:
@@ -162,7 +167,50 @@ public class ClientController : MonoBehaviour
 
                     Debug.Log("Client recieved game state: " + gs.state);
 
+                    Instance.cgr.ReceiveGameState(gs, msg.frame);
+
                     break;
+
+                case NetworkingMessageType.SERVER_SEND_ID:
+
+                    Instance.cgr.playerID = (uint)NetworkingMessageTranslator.ByteArrayToObject(msg.content);
+
+                    Debug.Log("Client received client ID: " + Instance.cgr.playerID);
+
+                    break;
+
+                case NetworkingMessageType.ENTITY_DATA:
+
+                    List<EntityData> ed = (List<EntityData>)NetworkingMessageTranslator.ByteArrayToObject(msg.content);
+
+                    Instance.cgr.ReceiveEntityData(ed, msg.frame);
+
+                    break;
+
+                case NetworkingMessageType.ENTITY_STATE:
+
+                    List<EntityState> es = (List<EntityState>)NetworkingMessageTranslator.ByteArrayToObject(msg.content);
+
+                    Instance.cgr.ReceiveEntityState(es, msg.frame);
+
+                    break;
+
+                case NetworkingMessageType.PLAYER_DATA:
+
+                    List<PlayerData> pd = (List<PlayerData>)NetworkingMessageTranslator.ByteArrayToObject(msg.content);
+
+                    Instance.cgr.ReceivePlayerData(pd, msg.frame);
+
+                    break;
+
+                case NetworkingMessageType.PLAYER_STATE:
+
+                    List<PlayerState> ps = (List<PlayerState>)NetworkingMessageTranslator.ByteArrayToObject(msg.content);
+
+                    Instance.cgr.ReceivePlayerState(ps, msg.frame);
+
+                    break;
+
             }
         }
         catch (Exception ex)
@@ -214,7 +262,6 @@ public class ClientController : MonoBehaviour
     {
         if(connected)
         {
-            Debug.Log(data.Length);
             client.SendMessageToConnection(connection, data, flags);
             onSent?.Invoke();
         }
