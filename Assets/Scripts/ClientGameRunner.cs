@@ -65,6 +65,8 @@ public class ClientGameRunner : MonoBehaviour
                 // CAMERA
                 // SEND COMMANDS
 
+               
+
                 break;
 
             // Used when game is over
