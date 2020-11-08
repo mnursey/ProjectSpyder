@@ -72,7 +72,7 @@ MonoBehaviour:
     suspensionHeight: 0.55
     suspensionRelaxSpeed: 1
     isPowered: 1
-  enginePower: 570
+  enginePower: 600
   steeringPower: 600
   brakingPower: 900
   tankSteering: 0
