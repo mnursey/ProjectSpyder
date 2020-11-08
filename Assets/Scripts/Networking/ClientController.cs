@@ -89,7 +89,8 @@ public class ClientController : MonoBehaviour
 
             if (connected)
             {
-
+                // Todo
+                // Send username
             }
             else
             {
@@ -159,7 +160,7 @@ public class ClientController : MonoBehaviour
 
                     GameState gs = (GameState)NetworkingMessageTranslator.ByteArrayToObject(msg.content);
 
-                    Debug.Log("Client recieved game state: " + gs.data);
+                    Debug.Log("Client recieved game state: " + gs.state);
 
                     break;
             }

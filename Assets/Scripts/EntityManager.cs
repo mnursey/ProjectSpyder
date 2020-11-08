@@ -108,13 +108,13 @@ public class EntityManager : MonoBehaviour
         }
     }
 
-    public List<EntityData> GetState()
+    public List<EntityState> GetState()
     {
-        List<EntityData> data = new List<EntityData>();
+        List<EntityState> data = new List<EntityState>();
 
         foreach(IEntity e in entities)
         {
-            data.Add(e.GetData());
+            data.Add(e.GetState());
         }
 
         return data;
@@ -127,6 +127,18 @@ public class EntityManager : MonoBehaviour
             UpdateEntity(ed);
         } 
     }
+
+    public List<EntityData> GetData ()
+    {
+        List<EntityData> data = new List<EntityData>();
+
+        foreach (IEntity e in entities)
+        {
+            data.Add(e.GetData());
+        }
+
+        return data;
+    }
 }
 
 public interface IEntity
@@ -136,6 +148,7 @@ public interface IEntity
     ushort entityPrefabIndex { get; set; }
 
     EntityData GetData();
+    EntityState GetState();
 }
 
 [Serializable]
@@ -166,15 +179,20 @@ public class GenericEntity : IEntity
     {
         return new EntityData(_id, _entityPrefabIndex, _gameObject.transform.position, _gameObject.transform.eulerAngles);
     }
+
+    public EntityState GetState()
+    {
+        return new EntityState(_id, _gameObject.transform.position, _gameObject.transform.eulerAngles);
+    }
 }
 
+// All entitiy properties
 [Serializable]
 public class EntityData
 {
     public ushort id;
     public ushort entityPrefabIndex;
 
-    // Todo use these
     public SVector3 pos;
     public SVector3 rot;
 
@@ -184,6 +202,25 @@ public class EntityData
     {
         this.id = id;
         this.entityPrefabIndex = entityPrefabIndex;
+        this.pos = new SVector3(pos);
+        this.rot = new SVector3(rot);
+    }
+}
+
+// Only entity properties to update clients about what is going on
+[Serializable]
+public class EntityState
+{
+    public ushort id;
+
+    public SVector3 pos;
+    public SVector3 rot;
+
+    public EntityState() { }
+
+    public EntityState(ushort id, Vector3 pos, Vector3 rot)
+    {
+        this.id = id;
         this.pos = new SVector3(pos);
         this.rot = new SVector3(rot);
     }

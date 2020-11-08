@@ -33,8 +33,8 @@ public class ClientCommander : MonoBehaviour
 
         if(connected)
         {
-            GameState gs = new GameState(username);
-            byte[] data = NetworkingMessageTranslator.GenerateGameStateNetworkingMessage(gs);
+            GameState gs = new GameState(GameStateEnum.JOINING);
+            byte[] data = NetworkingMessageTranslator.GenerateGameStateNetworkingMessage(gs, -1);
             cc.Send(data, Valve.Sockets.SendFlags.Reliable, null);
         }
     }
