@@ -1,0 +1,248 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4643327950743060505
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4643327950743060581}
+  - component: {fileID: 4643327950743060580}
+  - component: {fileID: 4643327950743060583}
+  - component: {fileID: 4643327950743060582}
+  - component: {fileID: 4643327950743060579}
+  - component: {fileID: 4643327950743060578}
+  - component: {fileID: 859831622}
+  m_Layer: 0
+  m_Name: Anti Tank
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &4643327950743060581
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4643327950743060505}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 2.03, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 5186690287200562009}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4643327950743060580
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4643327950743060505}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec6bd06048d85e14da74c5495578e97a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rb: {fileID: 4643327950743060582}
+  inputs: {fileID: 4643327950743060583}
+  axles:
+  - width: 0.4
+    offset: {x: 0.6, y: -1.3}
+    wheelRadius: 0.3
+    laterialFriction: 0.2
+    rollingFriction: 0.1
+    suspensionStiffness: 15000
+    suspensionDampining: 3000
+    suspensionHeight: 0.55
+    suspensionRelaxSpeed: 1
+    isPowered: 0
+  - width: 0.4
+    offset: {x: -0.8, y: -1.3}
+    wheelRadius: 0.3
+    laterialFriction: 0.2
+    rollingFriction: 0.1
+    suspensionStiffness: 15000
+    suspensionDampining: 3000
+    suspensionHeight: 0.55
+    suspensionRelaxSpeed: 1
+    isPowered: 1
+  enginePower: 600
+  steeringPower: 600
+  brakingPower: 900
+  tankSteering: 0
+  resetHeight: 1
+  centerOfMassYOffset: 0
+  canDriveOnEntities: 1
+  HP: 1500
+  piloted: 0
+  overturned: 0
+--- !u!114 &4643327950743060583
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4643327950743060505}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e472ef300c1cc5f478414dbba793580f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  steeringInput: 0
+  accelerationInput: 0
+  brakingInput: 0
+  nodeRadius: 2
+  turnDamping: 0.5
+  accelPrudence: 1
+  maxSpeed: 5
+  manualControl: 1
+  nodes:
+  - {x: 0, y: 15}
+  - {x: 0, y: -15}
+  - {x: 0, y: 10}
+--- !u!54 &4643327950743060582
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4643327950743060505}
+  serializedVersion: 2
+  m_Mass: 1000
+  m_Drag: 0
+  m_AngularDrag: 0.2
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!65 &4643327950743060579
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4643327950743060505}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 0.6, z: 1.74}
+  m_Center: {x: 0, y: -1.3, z: -0.13}
+--- !u!65 &4643327950743060578
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4643327950743060505}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 0.6, z: 1.4}
+  m_Center: {x: 0, y: -0.45, z: -0.5}
+--- !u!65 &859831622
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4643327950743060505}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.3, y: 0.3, z: 2.3}
+  m_Center: {x: 0, y: -0.49, z: 1.36}
+--- !u!1001 &4643327950852426930
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 4643327950743060581}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 377bebf836495be4c96293ab1c0c7287,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 377bebf836495be4c96293ab1c0c7287,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 377bebf836495be4c96293ab1c0c7287,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 377bebf836495be4c96293ab1c0c7287,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 377bebf836495be4c96293ab1c0c7287,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 377bebf836495be4c96293ab1c0c7287,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 377bebf836495be4c96293ab1c0c7287,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 377bebf836495be4c96293ab1c0c7287,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 377bebf836495be4c96293ab1c0c7287,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 377bebf836495be4c96293ab1c0c7287,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 377bebf836495be4c96293ab1c0c7287,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 377bebf836495be4c96293ab1c0c7287,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 377bebf836495be4c96293ab1c0c7287,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 377bebf836495be4c96293ab1c0c7287,
+        type: 3}
+      propertyPath: m_Name
+      value: AntiTank
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 377bebf836495be4c96293ab1c0c7287, type: 3}
+--- !u!4 &5186690287200562009 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 377bebf836495be4c96293ab1c0c7287,
+    type: 3}
+  m_PrefabInstance: {fileID: 4643327950852426930}
+  m_PrefabAsset: {fileID: 0}

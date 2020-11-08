@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ServerGameRunner : MonoBehaviour
 {
-    EntityManager em;
+    public EntityManager em;
     ServerController sc;
     public PlayerManager pm;
 
@@ -75,7 +75,7 @@ public class ServerGameRunner : MonoBehaviour
                     TransitionToPlaying();
                 }
 
-                if(pm.GetPlayerCount() > 1)
+                if(pm.GetPlayerCount() > 1 || true)
                 {
                     timer -= Time.deltaTime;
                 } else
@@ -123,21 +123,27 @@ public class ServerGameRunner : MonoBehaviour
 
     void TransitionToWaiting()
     {
+        Debug.Log("Transitioned to waiting state");
         state = GameStateEnum.WAITING;
         timer = waitingTime;
     }
 
     void TransitionToIdle()
     {
+        Debug.Log("Transitioned to idle state");
         state = GameStateEnum.IDLE;
     }
 
     void TransitionToPlaying()
     {
+        Debug.Log("Transitioned to playing state");
         state = GameStateEnum.PLAYING;
 
-        // Todo
         // For all players spawn units
+        foreach(Player p in pm.players)
+        {
+            SpawnInitialEntities(p);
+        }
 
         // Todo 
         // Spawn all map entities
@@ -150,8 +156,23 @@ public class ServerGameRunner : MonoBehaviour
 
     void TransitionToEnd()
     {
+        Debug.Log("Transitioned to end state");
         state = GameStateEnum.ENDING;
         timer = endTime;
+    }
+
+    void SpawnInitialEntities(Player p)
+    {
+        for(int i = 0; i < 5; ++i)
+        {
+            // TODO
+            // Change this to spawn 5 soldiers
+            IEntity e = em.CreateEntity(EntityType.JEEP);
+            p.controlledEntities.Add(e.id);
+
+            // TODO Set positions of units to a spawn position
+            e.gameObject.transform.position = new Vector3(i * 10f, 0f, 0f);
+        }
     }
 
     void GamePlaying()
@@ -164,6 +185,14 @@ public class ServerGameRunner : MonoBehaviour
         {
             SendPlayerState();
         }
+
+
+        // Send player update ever n frames
+        if (frame % entityStateSendRate == 0)
+        {
+            SendEntityState();
+        }
+
 
         // Send entity update ever m frames
         if (frame % gameStateSendRate == 0)

@@ -7,7 +7,6 @@ using System.Collections.Generic;
 class VehicleController : MonoBehaviour {
 
 	public Rigidbody rb;
-	public Vector3 centerOfMass = Vector3.zero;
 
 	public VehicleAI inputs;
 
@@ -28,8 +27,15 @@ class VehicleController : MonoBehaviour {
 	public float enginePower;
 	public float steeringPower;
 	public float brakingPower;
+	public bool tankSteering;
 
-	public Vector3 previousFramePosition;
+	[Header("Other")]
+
+	public float resetHeight;
+	public float centerOfMassYOffset;
+	public bool canDriveOnEntities;
+
+	Vector3 previousFramePosition;
 
 	//Added props
 
@@ -37,12 +43,14 @@ class VehicleController : MonoBehaviour {
 	public bool piloted = false; //Whether the vehicle currently has a driver
 	public bool overturned = false; //Whether vehicle needs to be flipped back over
 
-	public float stoppedThreshold = 0.1f;
+	float stoppedThreshold = 0.1f;
 
 
 	void Start(){
     	if(!rb) rb = GetComponent<Rigidbody>();
     	if(!inputs) inputs = GetComponent<VehicleAI>();
+
+    	rb.centerOfMass = new Vector3(0, rb.centerOfMass.y + centerOfMassYOffset, (frontAxle.offset.x + rearAxle.offset.x)/2);
     }
 
 	void Update(){
@@ -53,6 +61,7 @@ class VehicleController : MonoBehaviour {
 		rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         transform.localEulerAngles = new Vector3(0.0f, transform.localEulerAngles.y, 0.0f);
+        transform.position += Vector3.up*resetHeight;
 	}
 
 
@@ -84,7 +93,7 @@ class VehicleController : MonoBehaviour {
 
         RaycastHit hit;
 
-        int layerMask = ~LayerMask.GetMask("Entities", "Water");
+        int layerMask = canDriveOnEntities ? ~LayerMask.GetMask("Water") : LayerMask.GetMask("Terrain");
         bool hitSomething = Physics.Raycast(compressedWheelPos, -transform.up, out hit, axle.suspensionHeight, layerMask, QueryTriggerInteraction.Ignore);
 
         Debug.DrawLine(compressedWheelPos, compressedWheelPos - (transform.up * axle.suspensionHeight), Color.green);
@@ -168,17 +177,19 @@ class VehicleController : MonoBehaviour {
 
     void BrakingForce()
     {
+    	float effectiveBrakePower = (Vector2.Dot(rb.velocity, transform.forward) > 0) ? brakingPower : brakingPower/2;
+
         foreach (Axle axle in axles)
         {
             // Refactor this and remove the divide by 4. First count number of braking wheels on all axis
             if (axle.leftWheel.isGrounded)
             {
-                rb.AddForce(-transform.forward * brakingPower * Time.deltaTime * inputs.brakingInput / (2*axles.Length), ForceMode.Acceleration);
+                rb.AddForce(-transform.forward * effectiveBrakePower * Time.deltaTime * inputs.brakingInput / (2*axles.Length), ForceMode.Acceleration);
             }
 
             if (axle.rightWheel.isGrounded)
             {
-                rb.AddForce(-transform.forward * brakingPower * Time.deltaTime * inputs.brakingInput / (2*axles.Length), ForceMode.Acceleration);
+                rb.AddForce(-transform.forward * effectiveBrakePower * Time.deltaTime * inputs.brakingInput / (2*axles.Length), ForceMode.Acceleration);
             }
         }
     }
@@ -206,16 +217,30 @@ class VehicleController : MonoBehaviour {
 
     void SteeringForce()
     {
-        Axle axle = axles[Axle.FRONT_AXLE_INDEX];
+        Axle axle = frontAxle;
 
         if (axle.leftWheel.isGrounded)
         {
-            rb.AddForceAtPosition(transform.right * steeringPower * Time.deltaTime * inputs.steeringInput / 2, FixToCarCentre(WheelPosition(axle, axle.rightWheel)), ForceMode.Acceleration);
+            rb.AddForceAtPosition(transform.right * steeringPower * Time.deltaTime * inputs.steeringInput / 2, FixToCarCentre(WheelPosition(axle, axle.leftWheel)), ForceMode.Acceleration);
         }
 
         if (axle.rightWheel.isGrounded)
         {
             rb.AddForceAtPosition(transform.right * steeringPower * Time.deltaTime * inputs.steeringInput / 2, FixToCarCentre(WheelPosition(axle, axle.rightWheel)), ForceMode.Acceleration);
+        }
+
+        if(tankSteering){
+        	axle = rearAxle;
+
+        	if (axle.leftWheel.isGrounded)
+	        {
+	            rb.AddForceAtPosition(-transform.right * steeringPower * Time.deltaTime * inputs.steeringInput / 2, FixToCarCentre(WheelPosition(axle, axle.leftWheel)), ForceMode.Acceleration);
+	        }
+
+	        if (axle.rightWheel.isGrounded)
+	        {
+	            rb.AddForceAtPosition(-transform.right * steeringPower * Time.deltaTime * inputs.steeringInput / 2, FixToCarCentre(WheelPosition(axle, axle.rightWheel)), ForceMode.Acceleration);
+	        }
         }
     }
 
@@ -265,7 +290,7 @@ class VehicleController : MonoBehaviour {
     Vector3 FixToCarCentre(Vector3 point)
     {
         point = transform.InverseTransformPoint(point);
-        point.Set(point.x, 0.0f, point.z);
+        point.Set(point.x, rb.centerOfMass.y, point.z);
         point = transform.TransformPoint(point);
         return point;
     }

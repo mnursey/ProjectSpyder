@@ -98,6 +98,43 @@ public class ServerController : MonoBehaviour
 
                     // Add to player manager
                     Instance.sgr.pm.AddPlayer(info.connection);
+
+                    // TODO
+                    // Refactor all of these...
+
+                    // Send playerID to client
+                    {
+                        byte[] data;
+
+                        data = NetworkingMessageTranslator.GenerateClientIDNetworkingMessage(info.connection);
+
+                        // Reliable because we only send once.
+                        Instance.SendTo(info.connection, data, Valve.Sockets.SendFlags.Reliable);
+                    }
+
+                    // Send entity data
+                    {
+                        byte[] data;
+
+                        data = NetworkingMessageTranslator.GenerateEntityDataNetworkingMessage(Instance.sgr.em.GetData(), Instance.sgr.frame);
+
+                        // Reliable because we only send once.
+                        Instance.SendTo(info.connection, data, Valve.Sockets.SendFlags.Reliable);
+                    }
+
+                    // Send player data
+                    {
+                        byte[] data;
+
+                        data = NetworkingMessageTranslator.GeneratePlayerDataNetworkingMessage(Instance.sgr.pm.GetData(), Instance.sgr.frame);
+
+                        // Reliable because we only send once.
+                        Instance.SendTo(info.connection, data, Valve.Sockets.SendFlags.Reliable);
+                    }
+
+                    // End Refactor
+
+                    // Don't need to send gamestate since it will be updated in a second anyways...
                 }
                 else
                 {
@@ -158,6 +195,14 @@ public class ServerController : MonoBehaviour
                     GameState gs = (GameState)NetworkingMessageTranslator.ByteArrayToObject(msg.content);
 
                     Debug.Log("Server recieved game state: " + gs.state);
+
+                    break;
+
+                case NetworkingMessageType.CLIENT_USERNAME:
+
+                    string username = (string)NetworkingMessageTranslator.ByteArrayToObject(msg.content);
+
+                    sgr.pm.UpdateUsername(clientID, username);
 
                     break;
             }

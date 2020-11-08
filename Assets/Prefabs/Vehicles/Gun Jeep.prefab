@@ -1,0 +1,235 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8602467945394463094
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8602467945394463088}
+  - component: {fileID: 8602467945394463091}
+  - component: {fileID: 8602467945394463090}
+  - component: {fileID: 8602467945394463093}
+  - component: {fileID: 8602467945394463092}
+  - component: {fileID: 8602467945394463095}
+  - component: {fileID: 8602467945394463099}
+  m_Layer: 0
+  m_Name: Gun Jeep
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8602467945394463088
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8602467945394463094}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 8037066928821338535}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8602467945394463091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8602467945394463094}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec6bd06048d85e14da74c5495578e97a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rb: {fileID: 8602467945394463093}
+  inputs: {fileID: 8602467945394463090}
+  axles:
+  - width: 0.4
+    offset: {x: 0.6, y: 0.5}
+    wheelRadius: 0.3
+    laterialFriction: 0.3
+    rollingFriction: 0.1
+    suspensionStiffness: 11000
+    suspensionDampining: 3000
+    suspensionHeight: 0.7
+    suspensionRelaxSpeed: 1
+    isPowered: 0
+  - width: 0.4
+    offset: {x: -1, y: 0.5}
+    wheelRadius: 0.3
+    laterialFriction: 0.2
+    rollingFriction: 0.1
+    suspensionStiffness: 11000
+    suspensionDampining: 3000
+    suspensionHeight: 0.7
+    suspensionRelaxSpeed: 1
+    isPowered: 1
+  enginePower: 650
+  steeringPower: 600
+  brakingPower: 1000
+  tankSteering: 0
+  resetHeight: 0
+  centerOfMassYOffset: 0
+  canDriveOnEntities: 1
+  HP: 1000
+  piloted: 0
+  overturned: 0
+--- !u!114 &8602467945394463090
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8602467945394463094}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e472ef300c1cc5f478414dbba793580f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  steeringInput: 0
+  accelerationInput: 0
+  brakingInput: 0
+  nodeRadius: 2
+  turnDamping: 0.5
+  accelPrudence: 1
+  maxSpeed: 5
+  manualControl: 1
+  nodes: []
+--- !u!54 &8602467945394463093
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8602467945394463094}
+  serializedVersion: 2
+  m_Mass: 850
+  m_Drag: 0
+  m_AngularDrag: 0.2
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!65 &8602467945394463092
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8602467945394463094}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 0.6, z: 2.81}
+  m_Center: {x: 0, y: 0.53, z: -0.3}
+--- !u!65 &8602467945394463095
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8602467945394463094}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 0.46, z: 1.29}
+  m_Center: {x: 0, y: 1.07, z: -0.21}
+--- !u!65 &8602467945394463099
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8602467945394463094}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.4, y: 1.22, z: 1.99}
+  m_Center: {x: 0, y: 1.42, z: -0.7}
+--- !u!1001 &7495076885002643020
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 8602467945394463088}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: ffbdec3061ecddb4c93ba892dcaff7fd,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ffbdec3061ecddb4c93ba892dcaff7fd,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ffbdec3061ecddb4c93ba892dcaff7fd,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ffbdec3061ecddb4c93ba892dcaff7fd,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ffbdec3061ecddb4c93ba892dcaff7fd,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ffbdec3061ecddb4c93ba892dcaff7fd,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ffbdec3061ecddb4c93ba892dcaff7fd,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ffbdec3061ecddb4c93ba892dcaff7fd,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ffbdec3061ecddb4c93ba892dcaff7fd,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ffbdec3061ecddb4c93ba892dcaff7fd,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ffbdec3061ecddb4c93ba892dcaff7fd,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: ffbdec3061ecddb4c93ba892dcaff7fd,
+        type: 3}
+      propertyPath: m_Name
+      value: GunnerJeep
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: ffbdec3061ecddb4c93ba892dcaff7fd, type: 3}
+--- !u!4 &8037066928821338535 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: ffbdec3061ecddb4c93ba892dcaff7fd,
+    type: 3}
+  m_PrefabInstance: {fileID: 7495076885002643020}
+  m_PrefabAsset: {fileID: 0}
