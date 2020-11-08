@@ -139,8 +139,11 @@ public class ServerGameRunner : MonoBehaviour
         Debug.Log("Transitioned to playing state");
         state = GameStateEnum.PLAYING;
 
-        // Todo
         // For all players spawn units
+        foreach(Player p in pm.players)
+        {
+            SpawnInitialEntities(p);
+        }
 
         // Todo 
         // Spawn all map entities
@@ -156,6 +159,20 @@ public class ServerGameRunner : MonoBehaviour
         Debug.Log("Transitioned to end state");
         state = GameStateEnum.ENDING;
         timer = endTime;
+    }
+
+    void SpawnInitialEntities(Player p)
+    {
+        for(int i = 0; i < 5; ++i)
+        {
+            // TODO
+            // Change this to spawn 5 soldiers
+            IEntity e = em.CreateEntity(EntityType.JEEP);
+            p.controlledEntities.Add(e.id);
+
+            // TODO Set positions of units to a spawn position
+            e.gameObject.transform.position = new Vector3(i * 10f, 0f, 0f);
+        }
     }
 
     void GamePlaying()

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum EntityType { SOLDIER, JEEP, MG_JEEP, TANK, ANTI_TANK, MED_TRUCK, RAM_TRUCK, MECH, BUNKER, SHIELD_TANK};
 public class EntityManager : MonoBehaviour
 {
     public ushort idCounter = 0;
@@ -41,14 +42,14 @@ public class EntityManager : MonoBehaviour
         return entities.Find(x => x.id == id);
     }
 
-    public IEntity CreateEntity(ushort entityPrefabIndex)
+    public IEntity CreateEntity(EntityType type)
     {
         IEntity entity = new GenericEntity();
-        entity.entityPrefabIndex = entityPrefabIndex;
+        entity.entityPrefabIndex = (ushort)type;
 
         entity.id = ++idCounter;
 
-        GameObject g = Instantiate(entityPrefabs[entityPrefabIndex]);
+        GameObject g = Instantiate(entityPrefabs[(ushort)type]);
         entity.gameObject = g;
 
         return entity;
