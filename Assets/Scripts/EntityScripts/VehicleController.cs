@@ -58,10 +58,15 @@ class VehicleController : MonoBehaviour {
 	}
 
 	public void Reset(){
+		RaycastHit groundHit;
+		if(!Physics.Raycast(rb.centerOfMass+transform.position+Vector3.up*10f, Vector3.down, out groundHit, 15f, ~LayerMask.GetMask("Water"))){
+			return;
+		}
+
+		transform.eulerAngles = new Vector3(0.0f, transform.localEulerAngles.y, 0.0f);
+        transform.position = new Vector3(transform.position.x, groundHit.point.y + resetHeight, transform.position.z);
 		rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
-        transform.localEulerAngles = new Vector3(0.0f, transform.localEulerAngles.y, 0.0f);
-        transform.position += Vector3.up*resetHeight;
 	}
 
 

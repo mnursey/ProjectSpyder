@@ -19,7 +19,8 @@ public class VehicleAI : MonoBehaviour
 
     public bool manualControl;
 
-    public List<Vector2> nodes = new List<Vector2>();
+    Vector2 moveTarget;
+    bool hasMoveTarget;
 
     void Start(){
     	if(!rb){
@@ -27,39 +28,41 @@ public class VehicleAI : MonoBehaviour
     	}
     }
 
+    public void SetMoveTarget(Vector2 target){
+    	moveTarget = target;
+    	hasMoveTarget = true;
+    }
+
+    public void ClearMoveTarget(){
+    	hasMoveTarget = false;
+    }
+
     public void UpdateInputs(){
     	if(manualControl){
     		GetKeyboardInputs();
     		return;
     	}
-
-    	if(nodes.Count == 0){
-    		BrakeIfMoving();
-    	}else{
+    		
+    	if(hasMoveTarget){
     		Vector2 planePos = transform.position.DiscardY();
     		Vector2 planeVel = rb.velocity.DiscardY();
-    		Vector2 nodePos = nodes[0];
 
-    		if((planePos - nodePos).magnitude < nodeRadius){
-    			nodes.RemoveAt(0);
+    		//Negative angle means turn right, positive means turn left
+    		float nextNodeAngle = Mathf.Deg2Rad * Vector2.SignedAngle(transform.forward.DiscardY(), moveTarget - planePos);
+    		float alignment = Mathf.Cos(nextNodeAngle);
+    		int turnDirection =  -(int)Mathf.Sign(nextNodeAngle);
 
+    		steeringInput = Mathf.Pow(Mathf.Min(1-alignment, 1), turnDamping) * turnDirection;
+
+    		if(false && Vector2.Dot(moveTarget - planePos, planeVel) < 0){
+    			brakingInput = 1;
+    			accelerationInput = 0;
     		}else{
-	    		//Negative angle means turn right, positive means turn left
-	    		float nextNodeAngle = Mathf.Deg2Rad * Vector2.SignedAngle(transform.forward.DiscardY(), nodePos - planePos);
-	    		float alignment = Mathf.Cos(nextNodeAngle);
-	    		int turnDirection =  -(int)Mathf.Sign(nextNodeAngle);
-
-	    		steeringInput = Mathf.Pow(Mathf.Min(1-alignment, 1), turnDamping) * turnDirection;
-
-	    		if(false && Vector2.Dot(nodePos - planePos, planeVel) < 0){
-	    			brakingInput = 1;
-	    			accelerationInput = 0;
-	    		}else{
-	    			brakingInput = 0;
-	    			accelerationInput = Mathf.Pow(Mathf.Max(alignment, 0), accelPrudence);
-	    		}
-	    		
-	    	}
+    			brakingInput = 0;
+    			accelerationInput = Mathf.Pow(Mathf.Max(alignment, 0), accelPrudence);
+    		}
+    	}else{
+    		BrakeIfMoving();
     	}
     }
 

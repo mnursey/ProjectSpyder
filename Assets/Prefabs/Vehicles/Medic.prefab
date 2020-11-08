@@ -52,7 +52,7 @@ MonoBehaviour:
   inputs: {fileID: 2010621655362850899}
   axles:
   - width: 0.4
-    offset: {x: 1.5, y: -1.5}
+    offset: {x: 1.5, y: -1.6}
     wheelRadius: 0.3
     laterialFriction: 0.3
     rollingFriction: 0.1
@@ -62,7 +62,7 @@ MonoBehaviour:
     suspensionRelaxSpeed: 1
     isPowered: 0
   - width: 0.4
-    offset: {x: -0.7, y: -1.5}
+    offset: {x: -0.7, y: -1.6}
     wheelRadius: 0.3
     laterialFriction: 0.23
     rollingFriction: 0.1
@@ -75,7 +75,7 @@ MonoBehaviour:
   steeringPower: 600
   brakingPower: 1000
   tankSteering: 0
-  resetHeight: 1
+  resetHeight: 0
   centerOfMassYOffset: 0
   canDriveOnEntities: 1
   HP: 2000
@@ -100,7 +100,7 @@ MonoBehaviour:
   turnDamping: 0.5
   accelPrudence: 1
   maxSpeed: 5
-  manualControl: 1
+  manualControl: 0
   nodes: []
 --- !u!54 &2010621655362850900
 Rigidbody:

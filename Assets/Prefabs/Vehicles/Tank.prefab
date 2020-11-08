@@ -59,9 +59,9 @@ MonoBehaviour:
     wheelRadius: 0.3
     laterialFriction: 0.5
     rollingFriction: 0.2
-    suspensionStiffness: 30000
+    suspensionStiffness: 50000
     suspensionDampining: 5000
-    suspensionHeight: 0.55
+    suspensionHeight: 0.7
     suspensionRelaxSpeed: 1
     isPowered: 1
   - width: 2
@@ -69,14 +69,14 @@ MonoBehaviour:
     wheelRadius: 0.3
     laterialFriction: 0.5
     rollingFriction: 0.2
-    suspensionStiffness: 60000
+    suspensionStiffness: 50000
     suspensionDampining: 5000
-    suspensionHeight: 0.55
+    suspensionHeight: 0.7
     suspensionRelaxSpeed: 1
     isPowered: 1
   enginePower: 800
   steeringPower: 1000
-  brakingPower: 1500
+  brakingPower: 3200
   tankSteering: 1
   resetHeight: 0
   centerOfMassYOffset: 0
@@ -101,13 +101,9 @@ MonoBehaviour:
   brakingInput: 0
   nodeRadius: 2
   turnDamping: 0.5
-  accelPrudence: 1
+  accelPrudence: 1.5
   maxSpeed: 5
-  manualControl: 1
-  nodes:
-  - {x: 0, y: 15}
-  - {x: 0, y: -15}
-  - {x: 0, y: 10}
+  manualControl: 0
 --- !u!54 &8200930530569651360
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -121,9 +117,9 @@ Rigidbody:
   m_AngularDrag: 0.2
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!65 &8200930530569651363
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -96,11 +96,14 @@ MonoBehaviour:
   accelerationInput: 0
   brakingInput: 0
   nodeRadius: 2
-  turnDamping: 0.5
+  turnDamping: 0.3
   accelPrudence: 1
   maxSpeed: 5
   manualControl: 0
-  nodes: []
+  nodes:
+  - {x: -10, y: 10}
+  - {x: 10, y: -10}
+  - {x: 10, y: 10}
 --- !u!54 &3857865439974980437
 Rigidbody:
   m_ObjectHideFlags: 0
