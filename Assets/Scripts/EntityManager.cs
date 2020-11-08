@@ -93,6 +93,11 @@ public class EntityManager : MonoBehaviour
         UpdateEntity(GetEntity(ed.id), ed);
     }
 
+    public void UpdateEntity(EntityState es)
+    {
+        UpdateEntity(GetEntity(es.id), es);
+    }
+
     public void UpdateEntity(IEntity entity, EntityData ed)
     {
         IEntity e = GetEntity(ed.id);
@@ -108,6 +113,17 @@ public class EntityManager : MonoBehaviour
         }
     }
 
+    public void UpdateEntity(IEntity entity, EntityState es)
+    {
+        IEntity e = GetEntity(es.id);
+        if (e != null)
+        {
+            // Update entity
+            e.gameObject.transform.position = es.pos.GetValue();
+            e.gameObject.transform.eulerAngles = es.rot.GetValue();
+        }
+    }
+
     public List<EntityState> GetState()
     {
         List<EntityState> data = new List<EntityState>();
@@ -120,11 +136,11 @@ public class EntityManager : MonoBehaviour
         return data;
     }
 
-    public void SetState(List<EntityData> data)
+    public void SetState(List<EntityState> state)
     {
-        foreach(EntityData ed in data)
+        foreach(EntityState es in state)
         {
-            UpdateEntity(ed);
+            UpdateEntity(es);
         } 
     }
 
@@ -138,6 +154,14 @@ public class EntityManager : MonoBehaviour
         }
 
         return data;
+    }
+
+    public void SetData(List<EntityData> data)
+    {
+        foreach (EntityData ed in data)
+        {
+            UpdateEntity(ed);
+        }
     }
 }
 

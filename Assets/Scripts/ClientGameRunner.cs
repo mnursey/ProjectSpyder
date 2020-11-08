@@ -7,6 +7,7 @@ public enum GameStateEnum { IDLE, JOINING, WAITING, PLAYING, ENDING }
 public class ClientGameRunner : MonoBehaviour
 {
     EntityManager em;
+    PlayerManager pm;
     ClientController cc;
 
     GameStateEnum state;
@@ -24,19 +25,26 @@ public class ClientGameRunner : MonoBehaviour
     List<EntityState> incomingEntityState;
     List<EntityData> incomingEntityData;
 
+    public uint playerID;
+    public string username;
+
     // Start is called before the first frame update
     void Start()
     {
         em = GetComponent<EntityManager>();
+        pm = GetComponent<PlayerManager>();
         cc = ClientController.Instance;
+        ConnectToGame();
     }
 
     // Update is called once per frame
     void Update()
     {
         UpdateGameState();
+        UpdateEntities();
+        UpdatePlayers();
 
-        switch(state)
+        switch (state)
         {
             // Used for main menu
             case GameStateEnum.IDLE:
@@ -53,9 +61,6 @@ public class ClientGameRunner : MonoBehaviour
             // Used when playing game... Dead or alive
             case GameStateEnum.PLAYING:
 
-                UpdateEntities();
-                UpdatePlayers();
-
                 // TODO
                 // CAMERA
                 // SEND COMMANDS
@@ -70,7 +75,52 @@ public class ClientGameRunner : MonoBehaviour
 
     void ConnectToGame()
     {
+        cc.JoinGame(username, OnConnect, OnDisconnect, OnReject);
         // TODO
+    }
+
+    void OnConnect(bool connected)
+    {
+        if(connected)
+        {
+            // Send username
+            SendUsername();
+        } else
+        {
+            Debug.Log("Could not connect to server");
+            // Show could not connect UI
+            // Reset
+        }
+    }
+
+    void OnDisconnect()
+    {
+        Debug.Log("Disconnected from server");
+        // Show disconnected UI
+        // Reset
+    }
+
+    void OnReject(string reason)
+    {
+        Debug.Log("Rejected from server: " + reason);
+        // Show rejected reason UI
+        // Reset
+    }
+
+    void SendCommands()
+    {
+
+    }
+
+    void SendUsername()
+    {
+        // Sends username to the server
+        byte[] data;
+
+        data = NetworkingMessageTranslator.GenerateUsernameNetworkingMessage(username);
+
+        // Reliable because we only send once.
+        cc.Send(data, Valve.Sockets.SendFlags.Reliable, null);
     }
 
     void MoveCommand()
@@ -145,12 +195,51 @@ public class ClientGameRunner : MonoBehaviour
 
     public void UpdateEntities()
     {
-        // TODO
+        if (lastEntityDataUpdateFrame < lastEntityStateUpdateFrame)
+        {
+            // Data first...
+            if (incomingEntityData != null)
+            {
+                em.SetData(incomingEntityData);
+                incomingEntityData = null;
+            }
+
+            // Then state
+            em.SetState(incomingEntityState);
+        }
+        else
+        {
+            // Just data
+            if (incomingEntityData != null)
+            {
+                em.SetData(incomingEntityData);
+                incomingEntityData = null;
+            }
+        }
     }
 
     public void UpdatePlayers()
     {
-        // TODO
+        if(lastPlayerDataUpdateFrame < lastPlayerStateUpdateFrame)
+        {
+            // Data first...
+            if(incomingPlayerData != null)
+            {
+                pm.SetData(incomingPlayerData);
+                incomingPlayerData = null;
+            }
+
+            // Then state
+            pm.SetState(incomingPlayerState);
+        } else
+        {
+            // Just data
+            if (incomingPlayerData != null)
+            {
+                pm.SetData(incomingPlayerData);
+                incomingPlayerData = null;
+            }
+        }
     }
 
     public void UpdateGameState()
@@ -174,5 +263,13 @@ public class ClientGameRunner : MonoBehaviour
         incomingPlayerData = null;
         incomingEntityState = null;
         incomingEntityData = null;
+    }
+
+    public void Reset()
+    {
+        ResetGame();
+        playerID = 0;
+        state = GameStateEnum.IDLE;
+        pm.Reset();
     }
 }

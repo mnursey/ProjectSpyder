@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 1
+  m_UseShadowmask: 0
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -133,6 +133,7 @@ GameObject:
   - component: {fileID: 453921577}
   - component: {fileID: 453921578}
   - component: {fileID: 453921579}
+  - component: {fileID: 453921580}
   m_Layer: 0
   m_Name: ServerController
   m_TagString: Untagged
@@ -196,3 +197,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 608ec26f024012d44afa90fa6be8105b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  em: {fileID: 0}
+  pm: {fileID: 0}
+  timer: 0
+  waitingTime: 5
+  endTime: 15
+  zoneMaxSize: 100
+  zoneCloseRate: 0.001
+  gameStateSendRate: 50
+  playerStateSendRate: 10
+  entityStateSendRate: 4
+  frame: 0
+--- !u!114 &453921580
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 453921575}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c55e8f67d4a94774382db2f850965a7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  players: []

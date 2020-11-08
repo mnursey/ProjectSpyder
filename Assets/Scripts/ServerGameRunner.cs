@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ServerGameRunner : MonoBehaviour
 {
-    EntityManager em;
+    public EntityManager em;
     ServerController sc;
     public PlayerManager pm;
 
@@ -75,7 +75,7 @@ public class ServerGameRunner : MonoBehaviour
                     TransitionToPlaying();
                 }
 
-                if(pm.GetPlayerCount() > 1)
+                if(pm.GetPlayerCount() > 1 || true)
                 {
                     timer -= Time.deltaTime;
                 } else
@@ -123,17 +123,20 @@ public class ServerGameRunner : MonoBehaviour
 
     void TransitionToWaiting()
     {
+        Debug.Log("Transitioned to waiting state");
         state = GameStateEnum.WAITING;
         timer = waitingTime;
     }
 
     void TransitionToIdle()
     {
+        Debug.Log("Transitioned to idle state");
         state = GameStateEnum.IDLE;
     }
 
     void TransitionToPlaying()
     {
+        Debug.Log("Transitioned to playing state");
         state = GameStateEnum.PLAYING;
 
         // Todo
@@ -150,6 +153,7 @@ public class ServerGameRunner : MonoBehaviour
 
     void TransitionToEnd()
     {
+        Debug.Log("Transitioned to end state");
         state = GameStateEnum.ENDING;
         timer = endTime;
     }
