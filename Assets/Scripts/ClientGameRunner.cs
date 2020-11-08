@@ -11,11 +11,16 @@ public class ClientGameRunner : MonoBehaviour
 
     GameStateEnum state;
 
+    public Camera camera;
+
     // Start is called before the first frame update
     void Start()
     {
-        em = GetComponent<EntityManager>();
-        cc = ClientController.Instance;
+        //em = GetComponent<EntityManager>();
+        //cc = ClientController.Instance;
+        camera = GameObject.Find("Main Camera").GetComponent<Camera>();
+
+        state = GameStateEnum.PLAYING;
     }
 
     // Update is called once per frame
@@ -42,6 +47,8 @@ public class ClientGameRunner : MonoBehaviour
                 // CAMERA
                 // SEND COMMANDS
                 // UPDATE GAME STATE / VISUALS
+
+               
 
                 break;
 

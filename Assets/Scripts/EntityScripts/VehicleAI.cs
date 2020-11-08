@@ -32,15 +32,16 @@ public class VehicleAI : MonoBehaviour
     		GetKeyboardInputs();
     		return;
     	}
+
     	if(nodes.Count == 0){
     		BrakeIfMoving();
     	}else{
     		Vector2 planePos = transform.position.DiscardY();
+    		Vector2 planeVel = rb.velocity.DiscardY();
     		Vector2 nodePos = nodes[0];
 
     		if((planePos - nodePos).magnitude < nodeRadius){
     			nodes.RemoveAt(0);
-    			ClearInputs();
 
     		}else{
 	    		//Negative angle means turn right, positive means turn left
@@ -50,13 +51,15 @@ public class VehicleAI : MonoBehaviour
 
 	    		steeringInput = Mathf.Pow(Mathf.Min(1-alignment, 1), turnDamping) * turnDirection;
 
-	    		//if(rb.velocity.mag)
-	    		accelerationInput = Mathf.Pow(Mathf.Max(alignment, 0), accelPrudence);
+	    		if(false && Vector2.Dot(nodePos - planePos, planeVel) < 0){
+	    			brakingInput = 1;
+	    			accelerationInput = 0;
+	    		}else{
+	    			brakingInput = 0;
+	    			accelerationInput = Mathf.Pow(Mathf.Max(alignment, 0), accelPrudence);
+	    		}
+	    		
 	    	}
-
-
-
-
     	}
     }
 
@@ -67,17 +70,16 @@ public class VehicleAI : MonoBehaviour
 	}
 
     void BrakeIfMoving(){
-    	float speed = rb.velocity.magnitude;
+    	float speed = rb.velocity.DiscardY().magnitude;
+    	ClearInputs();
     	if(speed > 0.01f){
     		if(Vector2.Dot(transform.forward, rb.velocity) > 0){
     			brakingInput = 1 - 1/(speed + 1);
     		}else{
     			accelerationInput = 1 - 1/(speed + 1);
     		}
-    	}else{
-    		ClearInputs();
     	}
-    }
+	}	
 
     void ClearInputs(){
     	steeringInput = 0;
