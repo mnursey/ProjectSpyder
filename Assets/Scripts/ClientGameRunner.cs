@@ -44,6 +44,8 @@ public class ClientGameRunner : MonoBehaviour
         UpdateEntities();
         UpdatePlayers();
 
+        Debug.Log("Num entities: " + em.entities.Count);
+
         switch (state)
         {
             // Used for main menu
@@ -159,6 +161,15 @@ public class ClientGameRunner : MonoBehaviour
         }
     }
 
+    public void ReceiveEntityData(List<EntityData> ed, int frame)
+    {
+        if (incomingEntityData == null || lastEntityDataUpdateFrame < frame)
+        {
+            lastEntityDataUpdateFrame = frame;
+            incomingEntityData = ed;
+        }
+    }
+
     public void ReceivePlayerState(List<PlayerState> ps, int frame)
     {
         if (incomingPlayerState == null || lastPlayerStateUpdateFrame < frame)
@@ -174,15 +185,6 @@ public class ClientGameRunner : MonoBehaviour
         {
             lastGameStateUpdateFrame = frame;
             incomingGameState = gs;
-        }
-    }
-
-    public void ReceiveEntityData(List<EntityData> ed, int frame)
-    {
-        if (incomingEntityData == null || lastEntityDataUpdateFrame < frame)
-        {
-            lastEntityDataUpdateFrame = frame;
-            incomingEntityData = ed;
         }
     }
 

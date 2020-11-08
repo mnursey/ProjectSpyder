@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public enum EntityType { SOLDIER, JEEP, MG_JEEP, TANK, ANTI_TANK, MED_TRUCK, RAM_TRUCK, MECH, BUNKER, SHIELD_TANK};
+
+public enum EntityManagerMode { CLIENT, SERVER };
+
 public class EntityManager : MonoBehaviour
 {
     public ushort idCounter = 0;
@@ -13,6 +16,8 @@ public class EntityManager : MonoBehaviour
     public List<GameObject> entityPrefabs = new List<GameObject>();
 
     public static EntityManager Instance;
+
+    public EntityManagerMode mode;
 
     public void Awake()
     {
@@ -42,6 +47,24 @@ public class EntityManager : MonoBehaviour
         return entities.Find(x => x.id == id);
     }
 
+    void DisableServerSideEntityLogic(GameObject g)
+    {
+        foreach(Rigidbody r in g.GetComponentsInChildren<Rigidbody>())
+        {
+            r.isKinematic = true;
+        }
+
+        foreach (VehicleController vc in g.GetComponentsInChildren<VehicleController>())
+        {
+            vc.enabled = false;
+        }
+
+        foreach (VehicleAI va in g.GetComponentsInChildren<VehicleAI>())
+        {
+            va.enabled = false;
+        }
+    }
+
     public IEntity CreateEntity(EntityType type)
     {
         IEntity entity = new GenericEntity();
@@ -51,6 +74,13 @@ public class EntityManager : MonoBehaviour
 
         GameObject g = Instantiate(entityPrefabs[(ushort)type]);
         entity.gameObject = g;
+
+        entities.Add(entity);
+
+        if(mode == EntityManagerMode.CLIENT)
+        {
+            DisableServerSideEntityLogic(g);
+        }
 
         return entity;
     }
@@ -67,6 +97,13 @@ public class EntityManager : MonoBehaviour
 
         g.transform.position = ed.pos.GetValue();
         g.transform.eulerAngles = ed.rot.GetValue();
+
+        entities.Add(entity);
+
+        if (mode == EntityManagerMode.CLIENT)
+        {
+            DisableServerSideEntityLogic(g);
+        }
 
         return entity;
     }

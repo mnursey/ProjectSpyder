@@ -186,6 +186,14 @@ public class ServerGameRunner : MonoBehaviour
             SendPlayerState();
         }
 
+
+        // Send player update ever n frames
+        if (frame % entityStateSendRate == 0)
+        {
+            SendEntityState();
+        }
+
+
         // Send entity update ever m frames
         if (frame % gameStateSendRate == 0)
         {
