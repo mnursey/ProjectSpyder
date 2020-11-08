@@ -40,7 +40,14 @@ public class ServerGameRunner : MonoBehaviour
 
         if(frame % gameStateSendRate == 0)
         {
-            SendGameState();
+            if(state == GameStateEnum.WAITING || state == GameStateEnum.ENDING)
+            {
+                SendGameState(Mathf.FloorToInt(timer));
+            }
+            else
+            {
+                SendGameState(frame);
+            }
         }
 
         switch (state)
@@ -128,8 +135,12 @@ public class ServerGameRunner : MonoBehaviour
     void TransitionToPlaying()
     {
         state = GameStateEnum.PLAYING;
+
         // Todo
         // For all players spawn units
+
+        // Todo 
+        // Spawn all map entities
 
         // Send game state to all
         // Send player data to all
@@ -145,7 +156,8 @@ public class ServerGameRunner : MonoBehaviour
 
     void GamePlaying()
     {
-        CloseZone();
+        DecreaseZone();
+        ApplyZoneDamage();
 
         // Send player update ever n frames
         if (frame % playerStateSendRate == 0)
@@ -162,50 +174,81 @@ public class ServerGameRunner : MonoBehaviour
 
     void SendEntityState()
     {
-        // Todo
         // Sends entity state to all clients
         // Entity pos, rot, health, state, ...
-    } 
+        byte[] data;
 
-    void SendPlayerState()
-    {
-        // Todo
-        // Sends player state to all clients
-        // Which players control which entites
-    }
+        data = NetworkingMessageTranslator.GenerateEntityStateNetworkingMessage(em.GetState(), frame);
+
+        // Unreliable since if we miss one it will be updated at the next update
+        sc.SendToAll(data, Valve.Sockets.SendFlags.Unreliable);
+    } 
 
     void SendEntityData()
     {
-        // Todo
         // Sends entity data to all clients at start of game
         // Everything
+        byte[] data;
+
+        data = NetworkingMessageTranslator.GenerateEntityDataNetworkingMessage(em.GetData(), frame);
+
+        // Reliable because we'll only send this on game start, or when a client joins
+        sc.SendToAll(data, Valve.Sockets.SendFlags.Reliable);
+    }
+
+    void SendPlayerState()
+    {
+        // Sends player state to all clients
+        // Which players control which entites
+        byte[] data;
+
+        data = NetworkingMessageTranslator.GeneratePlayerStateNetworkingMessage(pm.GetState(), frame);
+
+        // Reliable because we'll only send this on game start, or when a client joins
+        sc.SendToAll(data, Valve.Sockets.SendFlags.Unreliable);
     }
 
     void SendPlayerData()
     {
-        // Todo
         // Sends player data to all clients at start of game
         // Everything
+        byte[] data;
+
+        data = NetworkingMessageTranslator.GeneratePlayerDataNetworkingMessage(pm.GetData(), frame);
+
+        // Reliable because we'll only send this on game start, or when a client joins
+        sc.SendToAll(data, Valve.Sockets.SendFlags.Reliable);
     }
 
-    void SendGameState()
+    void SendGameState(int frameHat)
     {
-        // Todo
         // Sends game state plus misc stuff...
+        byte[] data;
+
+        // Todo send actual zone size
+        data = NetworkingMessageTranslator.GenerateGameStateNetworkingMessage(new GameState(state, zoneMaxSize), frameHat);
+
+        // Reliable because we'll only send this on game start, or when a client joins
+        sc.SendToAll(data, Valve.Sockets.SendFlags.Reliable);
     }
 
     void SendComplete()
     {
         // Sends complete data.. everything
-        SendGameState();
+        SendGameState(frame);
         SendEntityData();
         SendPlayerData();
     }
 
-    void CloseZone()
+    void DecreaseZone()
     {
         // Todo
         // decrease radius of death zone
+    }
+
+    void ApplyZoneDamage()
+    {
+        // Todo
     }
 
     public void ResetGame()
@@ -219,6 +262,7 @@ public class ServerGameRunner : MonoBehaviour
 
     bool GameFinished()
     {
+        // TODO
         // Check if one player has units alive
         return false;
     }
