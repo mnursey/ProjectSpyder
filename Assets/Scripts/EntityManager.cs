@@ -54,6 +54,7 @@ public class EntityManager : MonoBehaviour
             r.isKinematic = true;
         }
 
+        /*
         foreach (VehicleController vc in g.GetComponentsInChildren<VehicleController>())
         {
             vc.enabled = false;
@@ -63,6 +64,7 @@ public class EntityManager : MonoBehaviour
         {
             va.enabled = false;
         }
+        */
 
         foreach (LerpController lc in g.GetComponentsInChildren<LerpController>())
         {
@@ -98,6 +100,7 @@ public class EntityManager : MonoBehaviour
         entity.entityPrefabIndex = ed.entityPrefabIndex;
 
         entity.id = ed.id;
+        entity.health = ed.health;
 
         GameObject g = Instantiate(entityPrefabs[ed.entityPrefabIndex]);
         entity.gameObject = g;
@@ -154,6 +157,7 @@ public class EntityManager : MonoBehaviour
         {
             // Update entity
             UpdateEntityPosRot(e, ed.pos.GetValue(), Quaternion.Euler(ed.rot.GetValue()));
+            e.health = ed.health;
         }
     }
 
@@ -164,6 +168,8 @@ public class EntityManager : MonoBehaviour
         {
             // Update entity
             UpdateEntityPosRot(e, es.pos.GetValue(), Quaternion.Euler(es.rot.GetValue()));
+            e.health = es.health;
+            e.attackTarget = es.attackTarget;
         }
     }
 
@@ -227,9 +233,12 @@ public interface IEntity
     GameObject gameObject { get; set; }
     ushort id { get; set; }
     ushort entityPrefabIndex { get; set; }
+    ushort health { get; set; }
+    ushort attackTarget { get; set; }
 
     EntityData GetData();
     EntityState GetState();
+    bool ShotThisFrame();
 }
 
 [Serializable]
@@ -256,14 +265,34 @@ public class GenericEntity : IEntity
         set => _entityPrefabIndex = value;
     }
 
+    private ushort _health;
+    public ushort health
+    {
+        get => _health;
+        set => _health = value;
+    }
+
+    private ushort _attackTarget;
+    public ushort attackTarget
+    {
+        get => _attackTarget;
+        set => _attackTarget = value;
+    }
+
     public EntityData GetData()
     {
-        return new EntityData(_id, _entityPrefabIndex, _gameObject.transform.position, _gameObject.transform.eulerAngles);
+        return new EntityData(_id, _entityPrefabIndex, _gameObject.transform.position, _gameObject.transform.eulerAngles, _health);
     }
 
     public EntityState GetState()
     {
-        return new EntityState(_id, _gameObject.transform.position, _gameObject.transform.eulerAngles);
+        return new EntityState(_id, _gameObject.transform.position, _gameObject.transform.eulerAngles, _health, _attackTarget);
+    }
+
+    public bool ShotThisFrame()
+    {
+        // TODO
+        return false;
     }
 }
 
@@ -276,15 +305,17 @@ public class EntityData
 
     public SVector3 pos;
     public SVector3 rot;
+    public ushort health;
 
     public EntityData () { }
 
-    public EntityData(ushort id, ushort entityPrefabIndex, Vector3 pos, Vector3 rot)
+    public EntityData(ushort id, ushort entityPrefabIndex, Vector3 pos, Vector3 rot, ushort health)
     {
         this.id = id;
         this.entityPrefabIndex = entityPrefabIndex;
         this.pos = new SVector3(pos);
         this.rot = new SVector3(rot);
+        this.health = health;
     }
 }
 
@@ -296,13 +327,17 @@ public class EntityState
 
     public SVector3 pos;
     public SVector3 rot;
+    public ushort health;
+    public ushort attackTarget;
 
     public EntityState() { }
 
-    public EntityState(ushort id, Vector3 pos, Vector3 rot)
+    public EntityState(ushort id, Vector3 pos, Vector3 rot, ushort health, ushort attackTarget)
     {
         this.id = id;
         this.pos = new SVector3(pos);
         this.rot = new SVector3(rot);
+        this.health = health;
+        this.attackTarget = attackTarget;
     }
 }
