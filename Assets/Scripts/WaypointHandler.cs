@@ -12,11 +12,13 @@ public class WaypointHandler : MonoBehaviour
     private Vector3 prevReachedWaypoint;
     private Vector3 prevDisp;
 
-    [SerializeField]
     private LineRenderer waypointLine;
 
     public float waypointRadius = 5f;
     public float minWaypointAngleDelta = 0;
+
+    // Detect target arrival within radius for first and last targets in a waypoint sequence
+    public bool useRadiusArrivalDetection = true;
 
     // References to the possible controller scripts
     public IUnit entityController;
@@ -65,7 +67,7 @@ public class WaypointHandler : MonoBehaviour
     // Return true of this object is within a certain distance of its target
     bool CheckArrivedAtTarget()
     {
-        if(waypoints.Count >= 1)
+        if(waypoints.Count >= 1 && prevReachedWaypoint.x < 1000000000)
         {
             Vector3 distanceToTarget = waypoints.Peek() - transform.position;
             Vector3 distanceFromPrev = prevReachedWaypoint - transform.position;
@@ -88,16 +90,18 @@ public class WaypointHandler : MonoBehaviour
     // Handle arriving at the first target
     public void Arrived()
     {
+        // Can we do prevReachedWaypoint = waypoints.Dequeue() ?
         waypoints.Dequeue();
         prevReachedWaypoint = entityController.GetMoveTarget();
         RemovePointFromLineRenderer();
 
+        // Update controller target if there are points remaining
         if (waypoints.Count >= 1){
             entityController.SetMoveTarget(waypoints.Peek());
-            
         }
         else
         {
+            // Clear target and hide line if no points remaining
             waypointLine.enabled = false;
             waypointLine.positionCount = 0;
             entityController.ClearMoveTarget();
