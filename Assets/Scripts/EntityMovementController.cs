@@ -4,15 +4,7 @@ using System.Security.Policy;
 using UnityEngine;
 
 
-public interface IWaypointFollower{
-    void SetTarget(Vector3 target);
-    void ClearTarget();
-    Vector3 GetTarget();
-    Vector3 GetPos();
-    //bool hasTarget;
-}
-
-public class EntityMovementController : MonoBehaviour, IWaypointFollower
+public class EntityMovementController : MonoBehaviour, IUnit
 {
     public Rigidbody rBody;
 
@@ -26,8 +18,11 @@ public class EntityMovementController : MonoBehaviour, IWaypointFollower
     [Tooltip("How high to fly!")]
     public float targetDistanceFromGround = 1.0f;
 
-    public Vector3 movementTarget;
-    public bool hasTarget = false;
+    public int HP;
+
+    private IUnit attackTarget;
+    private Vector3 movementTarget;
+    private bool hasMovementTarget = false;
 
     // Start is called before the first frame update
     void Start()
@@ -43,7 +38,7 @@ public class EntityMovementController : MonoBehaviour, IWaypointFollower
     // Update is called once per frame
     void Update()
     {
-        if(hasTarget)
+        if(hasMovementTarget)
         {
             // If we have some distance still to go
             MoveTowardPoint(movementTarget);
@@ -55,19 +50,43 @@ public class EntityMovementController : MonoBehaviour, IWaypointFollower
         }
     }
 
-    public void SetTarget(Vector3 target)
+    public void SetMoveTarget(Vector3 target)
     {
         movementTarget = target;
-        hasTarget = true;
+        hasMovementTarget = true;
     }
 
-    public void ClearTarget()
+    public void ClearMoveTarget()
     {
-        hasTarget = false;
+        hasMovementTarget = false;
     }
 
-    public Vector3 GetTarget(){
+    public Vector3 GetMoveTarget(){
         return movementTarget;
+    }
+
+    public void SetAttackTarget(IUnit target){
+        attackTarget = target;
+    }
+
+    public void ClearAttackTarget(){
+        attackTarget = null;
+    }
+
+    public IUnit GetAttackTarget(){
+        return attackTarget;
+    }
+
+    public void ReceiveAttack(Attack atk){
+        HP -= atk.damage;
+    }
+
+    public bool IsDestroyed(){
+        return HP <= 0;
+    }
+
+    public bool IsFriendly(){
+        return true;
     }
 
     public Vector3 GetPos(){
