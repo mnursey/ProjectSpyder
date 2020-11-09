@@ -43,6 +43,10 @@ public class VehicleAI : MonoBehaviour, IWaypointFollower
     	return movementTarget;
     }
 
+    public Vector3 GetPos(){
+    	return transform.position;
+    }
+
     public void UpdateInputs(){
     	if(manualControl){
     		GetKeyboardInputs();

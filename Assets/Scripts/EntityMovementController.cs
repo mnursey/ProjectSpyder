@@ -8,6 +8,7 @@ public interface IWaypointFollower{
     void SetTarget(Vector3 target);
     void ClearTarget();
     Vector3 GetTarget();
+    Vector3 GetPos();
     //bool hasTarget;
 }
 
@@ -67,6 +68,10 @@ public class EntityMovementController : MonoBehaviour, IWaypointFollower
 
     public Vector3 GetTarget(){
         return movementTarget;
+    }
+
+    public Vector3 GetPos(){
+        return transform.position;
     }
 
     // Apply some force to a rigidbody on this object in the direction of its target
