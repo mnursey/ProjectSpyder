@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class BoxSelectObjController : MonoBehaviour
 {
-    public Vector3 boxSelectBegin;
-    public Vector3 boxSelectEnd;
-    public Vector3 boxCenterLocation;
-    public Vector3 selectionBoundsCenter;
+    public Vector3 boxSelectBegin = new Vector3();
+    public Vector3 boxSelectEnd = new Vector3();
+    public Vector3 boxCenterLocation = new Vector3();
+    public Vector3 selectionBoundsCenter = new Vector3();
     public float selectionScaleX = 0.0f;
     public float selectionScaleZ = 0.0f;
     public float boxSelectHeight = 5.0f;
@@ -16,7 +17,6 @@ public class BoxSelectObjController : MonoBehaviour
     private MeshFilter selectionMeshFilter;
     private MeshRenderer selectionMeshRenderer;
     private Material meshMaterial;
-    //private Outline selectionMeshOutline;
 
 
     // Start is called before the first frame update
@@ -24,28 +24,20 @@ public class BoxSelectObjController : MonoBehaviour
     {
         // Init some stuff
         selectionMeshFilter = GetComponent<MeshFilter>();
-        boxSelectBegin = new Vector3();
-        boxSelectEnd = new Vector3();
-        boxCenterLocation = new Vector3();
+        selectionMeshFilter.mesh = Resources.Load<Mesh>(@"BoxSelectMeshRounded");
 
         // Add a material to our renderer
         selectionMeshRenderer = GetComponent<MeshRenderer>();
-        meshMaterial = Instantiate(Resources.Load<Material>(@"SelectionBox_Mat"));
+        meshMaterial = Instantiate(Resources.Load<Material>(@"BoxSelectMat"));
         var materials = selectionMeshRenderer.sharedMaterials.ToList();
-        //materials[0] = meshMaterial;
         materials.Clear(); 
         materials.Add(meshMaterial);
         selectionMeshRenderer.materials = materials.ToArray();
+        selectionMeshRenderer.shadowCastingMode = ShadowCastingMode.Off;
         selectionMeshRenderer.enabled = false;
 
-        // Make the selection box super tall
+        // Make the selection box tall
         transform.localScale = new Vector3(0.0f, boxSelectHeight, 0.0f);
-
-        /*  // Create the outline component and set its settings
-        selectionMeshOutline = GetComponent<Outline>();
-        selectionMeshOutline.OutlineWidth = 5.0f;
-        selectionMeshOutline.OutlineMode = Outline.Mode.OutlineVisible;
-        selectionMeshOutline.enabled = true;*/
     }
 
 
@@ -65,21 +57,6 @@ public class BoxSelectObjController : MonoBehaviour
         }
     }
 
-
-    public void SetMesh(Mesh mesh)
-    {
-        if(mesh != null)
-        {
-            if(selectionMeshFilter != null)
-            {
-                selectionMeshFilter.mesh = mesh;
-            }
-            else
-            {
-                Debug.Log("SelectionObjectController - selectionMeshFilter was null - unable to assign mesh");
-            }
-        }
-    }    
 
     public void SetVisibility(bool isVisible)
     {

@@ -28,7 +28,6 @@ public class PlayerControls : MonoBehaviour
         boxSelectObject.AddComponent<MeshFilter>();
         boxSelectObject.AddComponent<MeshRenderer>();
         boxSelectController = boxSelectObject.AddComponent<BoxSelectObjController>();
-        boxSelectController.SetMesh(boxSelectMesh);
     }
 
     // Update is called once per frame
