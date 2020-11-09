@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class VehicleAI : MonoBehaviour
+public class VehicleAI : MonoBehaviour, IWaypointFollower
 {
 	Rigidbody rb;
 
@@ -19,12 +19,32 @@ public class VehicleAI : MonoBehaviour
 
     public bool manualControl;
 
-    public List<Vector2> nodes = new List<Vector2>();
+    public Vector3 movementTarget;
+    public bool hasTarget = false;
 
     void Start(){
     	if(!rb){
     		rb = GetComponent<Rigidbody>();
     	}
+    }
+
+    public void SetTarget(Vector3 target)
+    {
+        movementTarget = target;
+        hasTarget = true;
+    }
+
+    public void ClearTarget()
+    {
+        hasTarget = false;
+    }
+
+    public Vector3 GetTarget(){
+    	return movementTarget;
+    }
+
+    public Vector3 GetPos(){
+    	return transform.position;
     }
 
     public void UpdateInputs(){
@@ -33,33 +53,29 @@ public class VehicleAI : MonoBehaviour
     		return;
     	}
 
-    	if(nodes.Count == 0){
-    		BrakeIfMoving();
-    	}else{
+    	if(hasTarget){
     		Vector2 planePos = transform.position.DiscardY();
     		Vector2 planeVel = rb.velocity.DiscardY();
-    		Vector2 nodePos = nodes[0];
+    		Vector2 nodePos = movementTarget.DiscardY();
 
-    		if((planePos - nodePos).magnitude < nodeRadius){
-    			nodes.RemoveAt(0);
+    		//Negative angle means turn right, positive means turn left
+    		//float nextNodeAngle = Mathf.Deg2Rad * Vector2.SignedAngle(transform.forward.DiscardY(), nodePos - planePos);
+    		float nextNodeAngle = Mathf.Deg2Rad * Vector2.SignedAngle(rb.velocity.DiscardY().normalized + transform.forward.DiscardY(), nodePos - planePos);
+    		float alignment = Mathf.Cos(nextNodeAngle);
+    		int turnDirection =  -(int)Mathf.Sign(nextNodeAngle);
 
+    		steeringInput = Mathf.Pow(Mathf.Min(1-alignment, 1), turnDamping) * turnDirection;
+
+    		if(false && Vector2.Dot(nodePos - planePos, planeVel) < 0){
+    			brakingInput = 1;
+    			accelerationInput = 0;
     		}else{
-	    		//Negative angle means turn right, positive means turn left
-	    		float nextNodeAngle = Mathf.Deg2Rad * Vector2.SignedAngle(transform.forward.DiscardY(), nodePos - planePos);
-	    		float alignment = Mathf.Cos(nextNodeAngle);
-	    		int turnDirection =  -(int)Mathf.Sign(nextNodeAngle);
-
-	    		steeringInput = Mathf.Pow(Mathf.Min(1-alignment, 1), turnDamping) * turnDirection;
-
-	    		if(false && Vector2.Dot(nodePos - planePos, planeVel) < 0){
-	    			brakingInput = 1;
-	    			accelerationInput = 0;
-	    		}else{
-	    			brakingInput = 0;
-	    			accelerationInput = Mathf.Pow(Mathf.Max(alignment, 0), accelPrudence);
-	    		}
-	    		
-	    	}
+    			brakingInput = 0;
+    			accelerationInput = Mathf.Pow(Mathf.Max(alignment, 0), accelPrudence);
+    		}
+	 
+    	}else{
+    		BrakeIfMoving();
     	}
     }
 

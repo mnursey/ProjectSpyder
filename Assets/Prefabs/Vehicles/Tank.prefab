@@ -52,7 +52,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 8200930530569651360}
-  centerOfMass: {x: 0, y: 0, z: 0}
   inputs: {fileID: 8200930530569651361}
   axles:
   - width: 2
@@ -80,7 +79,9 @@ MonoBehaviour:
   brakingPower: 1500
   tankSteering: 1
   resetHeight: 0
-  HP: 0
+  centerOfMassYOffset: 0
+  canDriveOnEntities: 1
+  HP: 6000
   piloted: 0
   overturned: 0
 --- !u!114 &8200930530569651361
