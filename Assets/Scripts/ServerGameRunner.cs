@@ -16,9 +16,9 @@ public class ServerGameRunner : MonoBehaviour
     public float zoneMaxSize = 100f;
     public float zoneCloseRate = 0.001f;
 
-    public int gameStateSendRate = 50;
-    public int playerStateSendRate = 10;
-    public int entityStateSendRate = 4;
+    public static int gameStateSendRate = 50;
+    public static int playerStateSendRate = 10;
+    public static int entityStateSendRate = 4;
 
     public int frame = 0;
 
