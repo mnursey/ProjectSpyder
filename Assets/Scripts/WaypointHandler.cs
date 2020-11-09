@@ -5,15 +5,19 @@ using UnityEngine;
 public class WaypointHandler : MonoBehaviour
 {
     [SerializeField]
-    private Queue<Vector3> waypoints;
+    private Queue<Vector3> waypoints = new Queue<Vector3>();
+    private Vector3 prevAddedWaypoint;
+    private Vector3 prevReachedWaypoint;
+    private Vector3 prevDisp;
 
     [SerializeField]
     private LineRenderer waypointLine;
 
+    public float waypointRadius = 1.5f;
+    public float minWaypointAngleDelta = 0;
+
     // References to the possible controller scripts
-    public EntityMovementController nonVehicleController;
-    public VehicleAI vehicleController;
-    private bool isVehicle = false; // True if we should use vehicle controller instead of movement controller
+    public IWaypointFollower entityController;
 
     [Header("Waypoint render settings")]
     [Tooltip("How high the waypoint line should sit above the ground")]
@@ -40,14 +44,7 @@ public class WaypointHandler : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        nonVehicleController = GetComponent<EntityMovementController>();
-        vehicleController = GetComponent<VehicleAI>();
-        if(vehicleController != null)
-        {
-            isVehicle = true;
-        }
-
-        waypoints = new Queue<Vector3>();
+        entityController = GetComponent<IWaypointFollower>();
     }
 
 
@@ -64,17 +61,24 @@ public class WaypointHandler : MonoBehaviour
 
 
     // Return true of this object is within a certain distance of its target
-    bool CheckArrivedAtTarget(float tolerance = 1.5f)
+    bool CheckArrivedAtTarget()
     {
-        if(waypoints.Count >= 1)
+        if(waypoints.Count >= 1 && prevReachedWaypoint.x < 1000000000)
         {
             Vector3 distanceToTarget = waypoints.Peek() - transform.position;
-            if (distanceToTarget.magnitude <= tolerance)
+            Vector3 distanceFromPrev = prevReachedWaypoint - transform.position;
+            return distanceToTarget.magnitude < distanceFromPrev.magnitude;
+        }
+        else if(waypoints.Count >= 1)
+        {
+            Vector3 distanceToTarget = waypoints.Peek() - transform.position;
+            if (distanceToTarget.magnitude <= waypointRadius)
             {
                 return true;
             }
             return false;
         }
+        
         return true;
     }
 
@@ -83,14 +87,17 @@ public class WaypointHandler : MonoBehaviour
     public void Arrived()
     {
         waypoints.Dequeue();
+        prevReachedWaypoint = entityController.GetTarget();
         RemovePointFromLineRenderer();
-        if (waypoints.Count >= 1)
-        {
-            UpdateTargetOnMovementControllers(waypoints.Peek());
+
+        if (waypoints.Count >= 1){
+            entityController.SetTarget(waypoints.Peek());
+            
         }
         else
         {
             waypointLine.enabled = false;
+            entityController.ClearTarget();
         }
     }
 
@@ -98,32 +105,38 @@ public class WaypointHandler : MonoBehaviour
     // Add a waypoint
     public void AddWaypoint(Vector3 waypoint)
     {
-        if(waypoints.Count == 0)
-        {
-            UpdateTargetOnMovementControllers(waypoint);
-        }
+        
 
-        // Add the waypoint to the queue so the entity can follow it
-        waypoints.Enqueue(waypoint);
+        if(waypoints.Count == 0){
+            prevReachedWaypoint = Vector3.positiveInfinity;
+            prevAddedWaypoint = waypoint;
+            entityController.SetTarget(waypoint);
+            waypoints.Enqueue(waypoint);
 
-        // Handle the visuals (line drawing)
-        AddPointToLineRenderer(waypoint);
-    }
+        }else{
+            Vector3 currentDisp = waypoint - prevAddedWaypoint;
+            float angle = (prevDisp != Vector3.zero) ? Vector3.Angle(prevDisp, currentDisp) : Mathf.Infinity;
+            if(waypoints.Count < 2 || angle >= minWaypointAngleDelta || (waypoint - prevAddedWaypoint).magnitude > 10){
+                prevAddedWaypoint = waypoint;
+                prevDisp = currentDisp;
+                waypoints.Enqueue(waypoint);
 
+            }else{
+                Vector3[] waypointArray = waypoints.ToArray();
+                waypointArray[waypointArray.Length-1] = waypoint;
+                waypoints = new Queue<Vector3>(waypointArray);
 
-    void UpdateTargetOnMovementControllers(Vector3 newTarget)
-    {
-        if (isVehicle)
-        {
-            //vehicleController.SetTarget(waypoint);
-        }
-        else
-        {
-            if (nonVehicleController != null)
-            {
-                nonVehicleController.SetTarget(newTarget);
+                RemoveLastPointFromLineRenderer();
+                
+                if(waypoints.Count == 1){
+                    entityController.SetTarget(waypoint);
+                }
             }
         }
+
+        AddPointToLineRenderer(waypoint);
+
+
     }
 
 
@@ -150,5 +163,19 @@ public class WaypointHandler : MonoBehaviour
             }
             waypointLine.positionCount--;
         }
+
+        waypointLine.Simplify(0.1f);
+    }
+
+    void RemoveLastPointFromLineRenderer()
+    {
+        int linePosCount = waypointLine.positionCount;
+        if (linePosCount > 2)
+        {
+            waypointLine.SetPosition(linePosCount - 2, waypointLine.GetPosition(linePosCount - 3));
+            waypointLine.SetPosition(linePosCount - 1, waypointLine.GetPosition(linePosCount - 3) + Vector3.up*waypointDestinationMarkerHeight);
+        }
+
+        waypointLine.Simplify(0.1f);
     }
 }
