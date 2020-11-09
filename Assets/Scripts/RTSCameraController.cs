@@ -11,7 +11,7 @@ public class RTSCameraController : MonoBehaviour
     public float positionLerpTime = 0.5f;
 
     [Tooltip("Slows the vertical movement speed")]
-    public float groundDistanceDamping = 0.1f;
+    public float groundDistanceDamping = 0.04f;
 
     [Header("Zoom settings")]
     [Tooltip("Target distance to maintain from ground (or other object directly below the camera)")]
@@ -65,6 +65,9 @@ public class RTSCameraController : MonoBehaviour
 
     void Update()
     {
+        // Update zoom
+        updateZoomLevel(Input.GetAxis("Mouse ScrollWheel"));
+
         // Get the desired translation based on input and apply the speed multiplier
         Vector3 translation = GetInputTranslationDirection() * Time.deltaTime;
         translation *= speedMultiplier;
@@ -83,9 +86,6 @@ public class RTSCameraController : MonoBehaviour
         m_TargetCameraState.Translate(translation);
         m_InterpolatingCameraState.LerpTowards(m_TargetCameraState, positionLerpPct);
         m_InterpolatingCameraState.UpdateTransform(transform);
-
-        // Update zoom
-        updateZoomLevel(Input.GetAxis("Mouse ScrollWheel"));
     }
 
 
