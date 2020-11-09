@@ -34,7 +34,7 @@ public class EntityManager : MonoBehaviour
     {
         idCounter = 0;
 
-        foreach(IEntity entity in entities)
+        foreach(IEntity entity in entities.ToArray())
         {
             RemoveEntity(entity);
         }
@@ -62,6 +62,13 @@ public class EntityManager : MonoBehaviour
         foreach (VehicleAI va in g.GetComponentsInChildren<VehicleAI>())
         {
             va.enabled = false;
+        }
+
+        foreach (LerpController lc in g.GetComponentsInChildren<LerpController>())
+        {
+            lc .enabled = true;
+            lc.updateRate = ServerGameRunner.entityStateSendRate;
+            lc.UpdateTargets(g.transform.position, g.transform.rotation);
         }
     }
 
@@ -146,8 +153,7 @@ public class EntityManager : MonoBehaviour
         } else
         {
             // Update entity
-            e.gameObject.transform.position = ed.pos.GetValue();
-            e.gameObject.transform.eulerAngles = ed.rot.GetValue();
+            UpdateEntityPosRot(e, ed.pos.GetValue(), Quaternion.Euler(ed.rot.GetValue()));
         }
     }
 
@@ -157,8 +163,21 @@ public class EntityManager : MonoBehaviour
         if (e != null)
         {
             // Update entity
-            e.gameObject.transform.position = es.pos.GetValue();
-            e.gameObject.transform.eulerAngles = es.rot.GetValue();
+            UpdateEntityPosRot(e, es.pos.GetValue(), Quaternion.Euler(es.rot.GetValue()));
+        }
+    }
+
+    public void UpdateEntityPosRot(IEntity e, Vector3 pos, Quaternion rot)
+    {
+        LerpController lc = e.gameObject.GetComponent<LerpController>();
+
+        if(lc == null)
+        {
+            e.gameObject.transform.position = pos;
+            e.gameObject.transform.rotation = rot;
+        } else
+        {
+            lc.UpdateTargets(pos, rot);
         }
     }
 
