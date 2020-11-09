@@ -18,6 +18,7 @@ public class PlayerControls : MonoBehaviour
 
     [Tooltip("The minimum allowable distance between consecutive waypoints")]
     public float minWaypointDistanceBetween = 1.0f;
+    public float minWaypointAngleBetween = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -60,7 +61,9 @@ public class PlayerControls : MonoBehaviour
         RaycastHit hitResult;
         if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitResult))
         {
-            if(Vector3.Distance(lastWaypointSet, hitResult.point) > minWaypointDistanceBetween)
+            float dist = Vector3.Distance(lastWaypointSet, hitResult.point);
+            //float angle = Vector3.Angle(lastWaypointSet, hitResult.point);
+            if(dist > minWaypointDistanceBetween)
             {
                 AddWaypointToSelectedEntities(hitResult.point);
                 lastWaypointSet = hitResult.point;
@@ -194,4 +197,19 @@ public class PlayerControls : MonoBehaviour
             }
         }
     }
+
+    /*
+    bool SelectedEntitiesHaveWaypoint(){
+        foreach (GameObject entity in selectedObjects)
+        {
+            var waypointHandler = entity.GetComponent<WaypointHandler>();
+            if (waypointHandler != null)
+            {
+                if(entity.hasTarget) return true;
+            }
+        }
+
+        return false;
+    }
+    */
 }

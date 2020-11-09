@@ -3,7 +3,15 @@ using System.Collections.Generic;
 using System.Security.Policy;
 using UnityEngine;
 
-public class EntityMovementController : MonoBehaviour
+
+public interface IWaypointFollower{
+    void SetTarget(Vector3 target);
+    void ClearTarget();
+    Vector3 GetTarget();
+    //bool hasTarget;
+}
+
+public class EntityMovementController : MonoBehaviour, IWaypointFollower
 {
     public Rigidbody rBody;
 
@@ -17,8 +25,8 @@ public class EntityMovementController : MonoBehaviour
     [Tooltip("How high to fly!")]
     public float targetDistanceFromGround = 1.0f;
 
-    private Vector3 movementTarget;
-    private bool hasTarget = false;
+    public Vector3 movementTarget;
+    public bool hasTarget = false;
 
     // Start is called before the first frame update
     void Start()
@@ -55,6 +63,10 @@ public class EntityMovementController : MonoBehaviour
     public void ClearTarget()
     {
         hasTarget = false;
+    }
+
+    public Vector3 GetTarget(){
+        return movementTarget;
     }
 
     // Apply some force to a rigidbody on this object in the direction of its target
