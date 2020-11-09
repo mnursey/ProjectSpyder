@@ -63,8 +63,6 @@ public class ClientController : MonoBehaviour
 
     public void ConnectToServer(string username, OnConnect onConnect, OnDisconnect onDisconnect, OnReject onReject)
     {
-        Debug.Log("Creating new client");
-
         this.onConnect = onConnect;
         this.onDisconnect = onDisconnect;
         this.onReject = onReject;
@@ -157,15 +155,11 @@ public class ClientController : MonoBehaviour
         {
             NetworkingMessage msg = NetworkingMessageTranslator.ParseMessage(messageDataBuffer);
 
-            Debug.Log("Got " + msg.type + " " + msg.content.Length);
-
             switch(msg.type)
             {
                 case NetworkingMessageType.GAME_STATE:
 
                     GameState gs = (GameState)NetworkingMessageTranslator.ByteArrayToObject(msg.content);
-
-                    Debug.Log("Client recieved game state: " + gs.state);
 
                     Instance.cgr.ReceiveGameState(gs, msg.frame);
 
