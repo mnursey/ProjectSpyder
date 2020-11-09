@@ -34,7 +34,7 @@ public class EntityManager : MonoBehaviour
     {
         idCounter = 0;
 
-        foreach(IEntity entity in entities)
+        foreach(IEntity entity in entities.ToArray())
         {
             RemoveEntity(entity);
         }

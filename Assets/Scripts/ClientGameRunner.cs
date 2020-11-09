@@ -10,7 +10,7 @@ public class ClientGameRunner : MonoBehaviour
     PlayerManager pm;
     ClientController cc;
 
-    GameStateEnum state;
+    public GameStateEnum state;
 
     int lastEntityDataUpdateFrame = 0;
     int lastPlayerDataUpdateFrame = 0;
@@ -34,7 +34,6 @@ public class ClientGameRunner : MonoBehaviour
         em = GetComponent<EntityManager>();
         pm = GetComponent<PlayerManager>();
         cc = ClientController.Instance;
-        ConnectToGame();
     }
 
     // Update is called once per frame
@@ -43,8 +42,6 @@ public class ClientGameRunner : MonoBehaviour
         UpdateGameState();
         UpdateEntities();
         UpdatePlayers();
-
-        Debug.Log("Num entities: " + em.entities.Count);
 
         switch (state)
         {
@@ -77,9 +74,50 @@ public class ClientGameRunner : MonoBehaviour
         }
     }
 
-    void ConnectToGame()
+    void TransitionToIdle()
     {
+        Debug.Log("Transitioned to idle state");
+        state = GameStateEnum.IDLE;
+
+    }
+
+    void TransitionToWaiting()
+    {
+        Debug.Log("Transitioned to waiting state");
+        state = GameStateEnum.WAITING;
+        MenuController.Instance.GoToWaitMenu();
+    }
+
+    void TransitionToJoining()
+    {
+        Debug.Log("Transitioned to joining state");
+        state = GameStateEnum.JOINING;
+
+    }
+
+    void TransitionToPlaying()
+    {
+        Debug.Log("Transitioned to playing state");
+        state = GameStateEnum.PLAYING;
+
+        // Close all menus
+        MenuController.Instance.CloseMenu();
+    }
+
+    void TransitionToEnding()
+    {
+        Debug.Log("Transitioned to ending state");
+        state = GameStateEnum.ENDING;
+        MenuController.Instance.GoToEndMenu();
+
+    }
+
+    public void ConnectToGame()
+    {
+        Reset();
         cc.JoinGame(username, OnConnect, OnDisconnect, OnReject);
+        TransitionToJoining();
+
         // TODO
     }
 
@@ -92,8 +130,12 @@ public class ClientGameRunner : MonoBehaviour
         } else
         {
             Debug.Log("Could not connect to server");
+
             // Show could not connect UI
-            // Reset
+            MenuController.Instance.GoToConnectionErrorMenu();
+            MenuController.Instance.SetConnectionErrorReason("Could not connect to server...\nCheck your connection...\nCheck if server is running...");
+
+            LeaveServer();
         }
     }
 
@@ -101,14 +143,21 @@ public class ClientGameRunner : MonoBehaviour
     {
         Debug.Log("Disconnected from server");
         // Show disconnected UI
-        // Reset
+        MenuController.Instance.GoToConnectionErrorMenu();
+        MenuController.Instance.SetConnectionErrorReason("Disconnected from server");
+
+        LeaveServer();
     }
 
     void OnReject(string reason)
     {
         Debug.Log("Rejected from server: " + reason);
         // Show rejected reason UI
-        // Reset
+
+        MenuController.Instance.GoToConnectionErrorMenu();
+        MenuController.Instance.SetConnectionErrorReason("Rejected from joining server.\n Reason:\n" + reason);
+
+        LeaveServer();
     }
 
     void SendCommands()
@@ -248,7 +297,53 @@ public class ClientGameRunner : MonoBehaviour
 
     public void UpdateGameState()
     {
-        // TODO
+        if(incomingGameState != null && state != incomingGameState.state)
+        {
+            // Transition to new state
+
+            switch(incomingGameState.state)
+            {
+                case GameStateEnum.IDLE:
+                    ResetGame();
+                    break;
+
+                case GameStateEnum.JOINING:
+                    Debug.LogError("Client should never receive joining state");
+                    break;
+
+                case GameStateEnum.PLAYING:
+                    TransitionToPlaying();
+                    break;
+
+                case GameStateEnum.WAITING:
+                    TransitionToWaiting();
+                    break;
+
+                case GameStateEnum.ENDING:
+                    TransitionToEnding();
+                    break;
+            }
+
+            state = incomingGameState.state;
+        }
+
+        if(incomingGameState != null)
+        {
+            switch (incomingGameState.state)
+            {
+                case GameStateEnum.WAITING:
+                    MenuController.Instance.SetWaitingText("Game starting in " + Mathf.RoundToInt(incomingGameState.zoneSize) + " seconds");
+                    break;
+
+                case GameStateEnum.ENDING:
+                    MenuController.Instance.SetEndingText("Next game in " + Mathf.RoundToInt(incomingGameState.zoneSize) + " seconds");
+                    break;
+
+                case GameStateEnum.PLAYING:
+                    // TODO update zone of death size
+                    break;
+            }
+        }
     }
 
     public void ResetGame()
@@ -273,7 +368,21 @@ public class ClientGameRunner : MonoBehaviour
     {
         ResetGame();
         playerID = 0;
-        state = GameStateEnum.IDLE;
+        TransitionToIdle();
         pm.Reset();
+
+        incomingGameState = null;
+
+        incomingEntityState = null;
+        incomingPlayerState = null;
+
+        incomingPlayerData = null;
+        incomingEntityData = null;
+    }
+
+    public void LeaveServer()
+    {
+        cc.Disconnect();
+        Reset();
     }
 }

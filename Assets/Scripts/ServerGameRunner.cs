@@ -40,14 +40,7 @@ public class ServerGameRunner : MonoBehaviour
 
         if(frame % gameStateSendRate == 0)
         {
-            if(state == GameStateEnum.WAITING || state == GameStateEnum.ENDING)
-            {
-                SendGameState(Mathf.FloorToInt(timer));
-            }
-            else
-            {
-                SendGameState(frame);
-            }
+            SendGameState();
         }
 
         switch (state)
@@ -108,11 +101,12 @@ public class ServerGameRunner : MonoBehaviour
                 if (!AnyPlayersActive())
                 {
                     TransitionToIdle();
-                }
-
-                if (timer < 0)
+                } else
                 {
-                    TransitionToIdle();
+                    if (timer < 0)
+                    {
+                        TransitionToWaiting();
+                    }
                 }
 
                 timer -= Time.deltaTime;
@@ -132,6 +126,13 @@ public class ServerGameRunner : MonoBehaviour
     {
         Debug.Log("Transitioned to idle state");
         state = GameStateEnum.IDLE;
+
+        if(!AnyPlayersActive())
+        {
+            pm.Reset();
+        }
+
+        ResetGame();
     }
 
     void TransitionToPlaying()
@@ -249,13 +250,22 @@ public class ServerGameRunner : MonoBehaviour
         sc.SendToAll(data, Valve.Sockets.SendFlags.Reliable);
     }
 
-    void SendGameState(int frameHat)
+    void SendGameState()
     {
         // Sends game state plus misc stuff...
         byte[] data;
 
-        // Todo send actual zone size
-        data = NetworkingMessageTranslator.GenerateGameStateNetworkingMessage(new GameState(state, zoneMaxSize), frameHat);
+        float zSize = 0.0f;
+        if (state == GameStateEnum.WAITING || state == GameStateEnum.ENDING)
+        {
+            zSize = timer;
+        }
+        else
+        {
+            // Todo send actual zone size
+        }
+
+        data = NetworkingMessageTranslator.GenerateGameStateNetworkingMessage(new GameState(state, zSize), frame);
 
         // Reliable because we'll only send this on game start, or when a client joins
         sc.SendToAll(data, Valve.Sockets.SendFlags.Reliable);
@@ -264,7 +274,7 @@ public class ServerGameRunner : MonoBehaviour
     void SendComplete()
     {
         // Sends complete data.. everything
-        SendGameState(frame);
+        SendGameState();
         SendEntityData();
         SendPlayerData();
     }
@@ -284,7 +294,7 @@ public class ServerGameRunner : MonoBehaviour
     {
         frame = 0;
         em.Reset();
-
+        
         // Todo
         // Reset zone size
     }
