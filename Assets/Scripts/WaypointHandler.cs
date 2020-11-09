@@ -6,6 +6,8 @@ public class WaypointHandler : MonoBehaviour
 {
     [SerializeField]
     private Queue<Vector3> waypoints = new Queue<Vector3>();
+    private Vector3 validationPoint;
+
     private Vector3 prevAddedWaypoint;
     private Vector3 prevReachedWaypoint;
     private Vector3 prevDisp;
@@ -65,12 +67,11 @@ public class WaypointHandler : MonoBehaviour
     // Return true of this object is within a certain distance of its target
     bool CheckArrivedAtTarget()
     {
-
         if(waypoints.Count >= 1 && prevReachedWaypoint.x < 1000000000)
         {
             Vector3 distanceToTarget = waypoints.Peek() - transform.position;
             Vector3 distanceFromPrev = prevReachedWaypoint - transform.position;
-            return distanceToTarget.magnitude < distanceFromPrev.magnitude;
+            return distanceToTarget.magnitude < Mathf.Min(distanceFromPrev.magnitude, 10);
         }
         else if(waypoints.Count >= 1)
         {
@@ -103,6 +104,7 @@ public class WaypointHandler : MonoBehaviour
         {
             // Clear target and hide line if no points remaining
             waypointLine.enabled = false;
+            waypointLine.positionCount = 0;
             entityController.ClearTarget();
         }
     }
@@ -111,18 +113,20 @@ public class WaypointHandler : MonoBehaviour
     // Add a waypoint
     public void AddWaypoint(Vector3 waypoint)
     {
-        
-
         if(waypoints.Count == 0){
-            prevReachedWaypoint = Vector3.positiveInfinity;
+            prevReachedWaypoint = entityController.GetPos();
+            AddPointToLineRenderer(prevReachedWaypoint);
             prevAddedWaypoint = waypoint;
+
+            validationPoint = waypoint + (waypoint - prevReachedWaypoint).normalized*0.1f;
+
             entityController.SetTarget(waypoint);
             waypoints.Enqueue(waypoint);
 
         }else{
             Vector3 currentDisp = waypoint - prevAddedWaypoint;
             float angle = (prevDisp != Vector3.zero) ? Vector3.Angle(prevDisp, currentDisp) : Mathf.Infinity;
-            if(waypoints.Count < 2 || angle >= minWaypointAngleDelta || (waypoint - prevAddedWaypoint).magnitude > 10){
+            if(waypoints.Count < 2 || angle >= minWaypointAngleDelta || (waypoint - prevAddedWaypoint).magnitude > 40){
                 prevAddedWaypoint = waypoint;
                 prevDisp = currentDisp;
                 waypoints.Enqueue(waypoint);
@@ -150,7 +154,7 @@ public class WaypointHandler : MonoBehaviour
     void AddPointToLineRenderer(Vector3 point)
     {
         waypointLine.enabled = true;
-        waypointLine.positionCount += 1;
+        waypointLine.positionCount = Mathf.Max(waypointLine.positionCount + 1, 2);
         int linePosCount = waypointLine.positionCount;
         waypointLine.SetPosition(linePosCount - 2, point + new Vector3(0.0f, waypointVerticalOffset, 0.0f));
         waypointLine.SetPosition(linePosCount - 1, point + new Vector3(0.0f, waypointDestinationMarkerHeight, 0.0f));
