@@ -372,6 +372,7 @@ GameObject:
   - component: {fileID: 5696870486744596359}
   - component: {fileID: 6118263481539007792}
   - component: {fileID: 6118263481539007801}
+  - component: {fileID: 433076230797087216}
   m_Layer: 9
   m_Name: Medic
   m_TagString: Untagged
@@ -547,6 +548,22 @@ MonoBehaviour:
   precomputeOutline: 0
   bakeKeys: []
   bakeValues: []
+--- !u!114 &433076230797087216
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5696870486744596358}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4581b428bbb37145bfbe4b8f2cd1d3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  explosionForce: 100
+  explosionRadius: 5
+  fragmentPrefabs: []
+  fragmentPositionOffsets: []
 --- !u!1 &7240574503204220761
 GameObject:
   m_ObjectHideFlags: 0
