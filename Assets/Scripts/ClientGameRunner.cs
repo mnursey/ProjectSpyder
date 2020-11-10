@@ -9,6 +9,7 @@ public class ClientGameRunner : MonoBehaviour
     EntityManager em;
     PlayerManager pm;
     ClientController cc;
+    KillzoneController kzc;
 
     public GameStateEnum state;
 
@@ -34,6 +35,7 @@ public class ClientGameRunner : MonoBehaviour
         em = GetComponent<EntityManager>();
         pm = GetComponent<PlayerManager>();
         cc = ClientController.Instance;
+        kzc = FindObjectOfType<KillzoneController>();
     }
 
     // Update is called once per frame
@@ -99,6 +101,8 @@ public class ClientGameRunner : MonoBehaviour
     {
         Debug.Log("Transitioned to playing state");
         state = GameStateEnum.PLAYING;
+
+        kzc.Init_Client(10000f, 0.0f, 1, 0f);
 
         // Close all menus
         MenuController.Instance.CloseMenu();
@@ -340,7 +344,7 @@ public class ClientGameRunner : MonoBehaviour
                     break;
 
                 case GameStateEnum.PLAYING:
-                    // TODO update zone of death size
+                    kzc.SetZone_Client(incomingGameState.zoneSize);
                     break;
             }
         }
