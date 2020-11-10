@@ -7,6 +7,7 @@ using System.Collections.Generic;
 class VehicleController : MonoBehaviour {
 
 	public Rigidbody rb;
+	public Transform turret;
 
 	public VehicleAI inputs;
 
@@ -28,6 +29,17 @@ class VehicleController : MonoBehaviour {
 	public float steeringPower;
 	public float brakingPower;
 	public bool tankSteering;
+	public float turretSpeed;
+
+	[Header("Combat")]
+	public int HP;
+	public int gunDamage;
+	public float gunRange;
+	public float fireRate;
+	public float gunForce;
+	public float gunExplosionRadius;
+	public float ramDamageMultiplier;
+	public float ramDamageResist = 1;
 
 	[Header("Other")]
 
@@ -35,15 +47,14 @@ class VehicleController : MonoBehaviour {
 	public float centerOfMassYOffset;
 	public bool canDriveOnEntities;
 
-	Vector3 previousFramePosition;
-
-	//Added props
-
-	public int HP;
+	[Header("Status Data")]
+	
 	public bool piloted = false; //Whether the vehicle currently has a driver
 	public bool overturned = false; //Whether vehicle needs to be flipped back over
 
 	float stoppedThreshold = 0.1f;
+	Vector3 previousFramePosition;
+	float collisionCooldown = 0;
 
 
 	void Start(){
@@ -55,13 +66,62 @@ class VehicleController : MonoBehaviour {
 
 	void Update(){
 		inputs.UpdateInputs();
+		collisionCooldown = Mathf.Max(0, collisionCooldown - Time.deltaTime);
+
+
 	}
 
 	public void Reset(){
 		rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         transform.localEulerAngles = new Vector3(0.0f, transform.localEulerAngles.y, 0.0f);
-        transform.position += Vector3.up*resetHeight;
+        rb.position += Vector3.up*resetHeight;
+	}
+
+	void OnCollisionEnter(Collision other){
+		//If collided with other entity
+		if(other.gameObject.layer == 9){
+			IUnit unit = other.gameObject.GetComponent<IUnit>();
+			if(unit != null){
+				
+				float otherMomentum = Vector3.Dot(other.rigidbody.velocity, rb.velocity.normalized) * other.rigidbody.mass;
+				float momentum = rb.velocity.magnitude * rb.mass;
+				float totalMomentum = Mathf.Abs(momentum + otherMomentum);
+ 
+ 				Vector2 collisionDir = (other.GetContact(0).point - (rb.position + rb.centerOfMass)).DiscardY().normalized;
+				float alignment = Vector2.Dot(rb.velocity.DiscardY().normalized, collisionDir);
+				float alignmentMultiplier = Mathf.Max(0.3f, alignment);
+
+				unit.ReceiveAttack(new Attack((int)(totalMomentum * ramDamageMultiplier * alignmentMultiplier), DamageType.Collision));
+			}
+		}
+	}
+
+
+
+	public void ReceiveAttack(Attack atk){
+		if(atk.type == DamageType.Collision){
+    		if(collisionCooldown == 0){
+    			collisionCooldown = 1;
+    			atk.damage = (int)(atk.damage / Mathf.Max(ramDamageResist, 0.01f));
+    		}else{
+    			return;
+    		}
+    	}else if(atk.type == DamageType.Ballistic && atk.explosionRadius > 0){
+    		Collider[] hits = Physics.OverlapSphere(atk.point, atk.explosionRadius, LayerMask.GetMask("Entity"));
+    		List<Rigidbody> processed = new List<Rigidbody>();
+
+    		foreach(Collider c in hits){
+    			Rigidbody r = c.attachedRigidbody;
+    			if(processed.Contains(r)) continue;
+
+    			r.AddExplosionForce(atk.force, atk.point, atk.explosionRadius, 0.5f);
+    			processed.Add(r);
+    		}
+    	}
+
+        HP -= atk.damage;
+        Debug.Log(gameObject.name +" was hit for "+ atk.damage +" damage!");
 	}
 
 
@@ -71,11 +131,24 @@ class VehicleController : MonoBehaviour {
 
 		if(overturned) Reset();
 
-
 		SuspensionForce();
         EngineForce();
         SteeringForce();
         BrakingForce();
+
+        if(inputs.atkStyle == AttackStyle.TurretGun){
+    		float turretAngle = -turret.localEulerAngles.y;
+    		float angleToTarget = inputs.targetTurretAngle - turretAngle;
+    		if(Mathf.Abs(angleToTarget) > 180){
+    			angleToTarget -= 360*Mathf.Sign(angleToTarget);
+    		}
+
+    		if(Mathf.Abs(angleToTarget) > turretSpeed){
+    			turret.localEulerAngles = new Vector3(turret.localEulerAngles.x, -(turretAngle + turretSpeed*Mathf.Sign(angleToTarget)), turret.localEulerAngles.z);
+    		}else{
+    			turret.localEulerAngles = new Vector3(turret.localEulerAngles.x, -inputs.targetTurretAngle, turret.localEulerAngles.z);
+    		}
+    	}
 	}
 
 	void SuspensionForce()

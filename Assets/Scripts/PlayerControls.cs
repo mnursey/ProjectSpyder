@@ -188,7 +188,7 @@ public class PlayerControls : MonoBehaviour
     {
         if (!selectedObjects.Contains(selectedObject) && ClientGameRunner.Instance.IsOurUnit(selectedObject))
         {
-            Debug.Log("Selecting object");
+            //Debug.Log("Selecting object");
             selectedObjects.Add(selectedObject);
             UpdateOutlineOnObject(selectedObject, true);
         }
