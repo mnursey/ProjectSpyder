@@ -14,14 +14,14 @@ public class WaypointHandler : MonoBehaviour
 
     private LineRenderer waypointLine;
 
-    public float waypointRadius = 1.5f;
+    public float waypointRadius = 5f;
     public float minWaypointAngleDelta = 0;
 
     // Detect target arrival within radius for first and last targets in a waypoint sequence
     public bool useRadiusArrivalDetection = true;
 
     // References to the possible controller scripts
-    public IWaypointFollower entityController;
+    public IUnit entityController;
 
     [Header("Waypoint render settings")]
     [Tooltip("How high the waypoint line should sit above the ground")]
@@ -48,7 +48,7 @@ public class WaypointHandler : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        entityController = GetComponent<IWaypointFollower>();
+        entityController = GetComponent<IUnit>();
     }
 
 
@@ -71,7 +71,7 @@ public class WaypointHandler : MonoBehaviour
         {
             Vector3 distanceToTarget = waypoints.Peek() - transform.position;
             Vector3 distanceFromPrev = prevReachedWaypoint - transform.position;
-            return distanceToTarget.magnitude < Mathf.Min(distanceFromPrev.magnitude, 10);
+            return distanceToTarget.magnitude < Mathf.Min(distanceFromPrev.magnitude, waypointRadius);
         }
         else if(waypoints.Count >= 1)
         {
@@ -92,26 +92,25 @@ public class WaypointHandler : MonoBehaviour
     {
         // Can we do prevReachedWaypoint = waypoints.Dequeue() ?
         waypoints.Dequeue();
-        prevReachedWaypoint = entityController.GetTarget();
-
+        prevReachedWaypoint = entityController.GetMoveTarget();
         RemovePointFromLineRenderer();
 
         // Update controller target if there are points remaining
         if (waypoints.Count >= 1){
-            entityController.SetTarget(waypoints.Peek());
+            entityController.SetMoveTarget(waypoints.Peek());
         }
         else
         {
             // Clear target and hide line if no points remaining
             waypointLine.enabled = false;
             waypointLine.positionCount = 0;
-            entityController.ClearTarget();
+            entityController.ClearMoveTarget();
         }
     }
 
 
     // Add a waypoint
-    public void AddWaypoint(Vector3 waypoint)
+    public void AddWaypoint(Vector3 waypoint, bool forcePlacement)
     {
         if(waypoints.Count == 0){
             prevReachedWaypoint = entityController.GetPos();
@@ -120,13 +119,13 @@ public class WaypointHandler : MonoBehaviour
 
             validationPoint = waypoint + (waypoint - prevReachedWaypoint).normalized*0.1f;
 
-            entityController.SetTarget(waypoint);
+            entityController.SetMoveTarget(waypoint);
             waypoints.Enqueue(waypoint);
 
         }else{
             Vector3 currentDisp = waypoint - prevAddedWaypoint;
             float angle = (prevDisp != Vector3.zero) ? Vector3.Angle(prevDisp, currentDisp) : Mathf.Infinity;
-            if(waypoints.Count < 2 || angle >= minWaypointAngleDelta || (waypoint - prevAddedWaypoint).magnitude > 40){
+            if(forcePlacement || waypoints.Count < 2 || angle >= minWaypointAngleDelta || (waypoint - prevAddedWaypoint).magnitude > 40){
                 prevAddedWaypoint = waypoint;
                 prevDisp = currentDisp;
                 waypoints.Enqueue(waypoint);
@@ -139,14 +138,19 @@ public class WaypointHandler : MonoBehaviour
                 RemoveLastPointFromLineRenderer();
                 
                 if(waypoints.Count == 1){
-                    entityController.SetTarget(waypoint);
+                    entityController.SetMoveTarget(waypoint);
                 }
             }
         }
 
         AddPointToLineRenderer(waypoint);
+    }
 
-
+    public void ClearWaypoints(){
+        waypoints.Clear();
+        entityController.ClearMoveTarget();
+        waypointLine.enabled = false;
+        waypointLine.positionCount = 0;
     }
 
 

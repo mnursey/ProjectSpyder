@@ -5,10 +5,10 @@ using UnityEngine.Rendering;
 
 public class KillzoneController : MonoBehaviour
 {
-    float height = 100.0f;
-    float radius = 0.0f;
+    public float height = 100.0f;
+    public float radius = 0.0f;
     float minRadius = 0.0f;
-    float damagePerSecond = 0.0f;
+    ushort damagePerSecond = 1;
     float zoneDecreaseRate = 0.0f;
     MeshFilter mesh;
     MeshRenderer meshRenderer;
@@ -23,8 +23,9 @@ public class KillzoneController : MonoBehaviour
         DecreaseZone_Client();
     }
     */
+    
 
-    public void Init_Server(float radius, float minRadius, float damagePerSecond, float zoneDecreaseRate)
+    public void Init_Server(float radius, float minRadius, ushort damagePerSecond, float zoneDecreaseRate)
     {
         this.radius = radius;
         this.minRadius = minRadius;
@@ -32,7 +33,7 @@ public class KillzoneController : MonoBehaviour
         this.zoneDecreaseRate = zoneDecreaseRate;
     }
 
-    public void Init_Client(float radius, float minRadius, float damagePerSecond, float zoneDecreaseRate)
+    public void Init_Client(float radius, float minRadius, ushort damagePerSecond, float zoneDecreaseRate)
     {
         Init_Server(radius, minRadius, damagePerSecond, zoneDecreaseRate);
 
@@ -63,7 +64,7 @@ public class KillzoneController : MonoBehaviour
     }
 
     // I don't actually know how passing by ref works in c#. Does this make any sense at all?
-    void ApplyDamage(ref List<IEntity> entities)
+    public void ApplyDamage(List<IEntity> entities)
     {
         foreach(IEntity entity in entities)
         {
@@ -75,7 +76,7 @@ public class KillzoneController : MonoBehaviour
         }
     }
 
-    void DecreaseZone_Server()
+    public void DecreaseZone_Server()
     {
         if(radius > minRadius)
         {
@@ -83,9 +84,9 @@ public class KillzoneController : MonoBehaviour
         }
     }
 
-    void DecreaseZone_Client()
+    public void SetZone_Client(float radius)
     {
-        DecreaseZone_Server();
+        this.radius = radius;
         transform.localScale = new Vector3(radius, height, radius);
     }
 

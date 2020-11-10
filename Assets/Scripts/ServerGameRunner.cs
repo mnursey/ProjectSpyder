@@ -7,6 +7,7 @@ public class ServerGameRunner : MonoBehaviour
     public EntityManager em;
     ServerController sc;
     public PlayerManager pm;
+    KillzoneController kzc;
 
     GameStateEnum state;
 
@@ -16,9 +17,9 @@ public class ServerGameRunner : MonoBehaviour
     public float zoneMaxSize = 100f;
     public float zoneCloseRate = 0.001f;
 
-    public int gameStateSendRate = 50;
-    public int playerStateSendRate = 10;
-    public int entityStateSendRate = 4;
+    public static int gameStateSendRate = 50;
+    public static int playerStateSendRate = 10;
+    public static int entityStateSendRate = 4;
 
     public int frame = 0;
 
@@ -27,6 +28,7 @@ public class ServerGameRunner : MonoBehaviour
         em = GetComponent<EntityManager>();
         pm = GetComponent<PlayerManager>();
         sc = ServerController.Instance;
+        kzc = FindObjectOfType<KillzoneController>();
     }
 
     void Update()
@@ -146,6 +148,8 @@ public class ServerGameRunner : MonoBehaviour
             SpawnInitialEntities(p);
         }
 
+        kzc.Init_Server(zoneMaxSize, 0.0f, 1, zoneCloseRate);
+
         // Todo 
         // Spawn all map entities
 
@@ -262,7 +266,8 @@ public class ServerGameRunner : MonoBehaviour
         }
         else
         {
-            // Todo send actual zone size
+            // send zone size
+            zSize = kzc.radius;
         }
 
         data = NetworkingMessageTranslator.GenerateGameStateNetworkingMessage(new GameState(state, zSize), frame);
@@ -281,13 +286,12 @@ public class ServerGameRunner : MonoBehaviour
 
     void DecreaseZone()
     {
-        // Todo
-        // decrease radius of death zone
+        kzc.DecreaseZone_Server();
     }
 
     void ApplyZoneDamage()
     {
-        // Todo
+        kzc.ApplyDamage(em.entities);
     }
 
     public void ResetGame()

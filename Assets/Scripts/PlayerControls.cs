@@ -1,9 +1,26 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Serialization;
+
+
+public interface IUnit{
+    void SetMoveTarget(Vector3 target);
+    void ClearMoveTarget();
+    Vector3 GetMoveTarget();
+
+    void SetAttackTarget(IUnit target);
+    void ClearAttackTarget();
+    IUnit GetAttackTarget();
+
+    void ReceiveAttack(Attack atk);
+    bool IsDestroyed();
+    bool IsFriendly();
+
+    Vector3 GetPos();
+}
+
 
 public class PlayerControls : MonoBehaviour
 {
@@ -11,6 +28,7 @@ public class PlayerControls : MonoBehaviour
     public Mesh boxSelectMesh;
     private GameObject boxSelectObject;
     private BoxSelectObjController boxSelectController;
+    bool boxSelectActive = false;
 
     // Other stuff
     private List<GameObject> selectedObjects;
@@ -18,7 +36,6 @@ public class PlayerControls : MonoBehaviour
 
     [Tooltip("The minimum allowable distance between consecutive waypoints")]
     public float minWaypointDistanceBetween = 1.0f;
-    public float minWaypointAngleBetween = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -33,38 +50,56 @@ public class PlayerControls : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        bool shift = Input.GetKey("left shift");
+
         if(Input.GetButtonDown("Select Primary"))
         {
-            SelectIndividual();
-            BoxSelectBegin();
+            if(shift){
+                BoxSelectBegin();
+            }
         }
         
         if (Input.GetButton("Select Primary"))
         {
-            BoxSelectUpdate();
+            if(boxSelectActive){
+                BoxSelectUpdate();
+            }
         }
 
         if (Input.GetButtonUp("Select Primary"))
         {
-            BoxSelectEnd();
+            if(boxSelectActive){
+                BoxSelectEnd();
+            }else{
+                SelectIndividual();
+            }
         }
 
-        if(Input.GetButton("Select Secondary"))
+        if(Input.GetButtonDown("Select Secondary"))
         {
-            SetWaypoint();
+            SetWaypoint(true);
+        }else if(Input.GetButton("Select Secondary"))
+        {
+            SetWaypoint(false);
         }
+
+        if(Input.GetKeyDown("space"))
+        {
+            ClearSelectedEntityWaypoints();
+        }
+
     }
 
-    void SetWaypoint()
+    void SetWaypoint(bool buttonDown)
     {
         RaycastHit hitResult;
         if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitResult))
         {
             float dist = Vector3.Distance(lastWaypointSet, hitResult.point);
             //float angle = Vector3.Angle(lastWaypointSet, hitResult.point);
-            if(dist > minWaypointDistanceBetween)
+            if(dist > minWaypointDistanceBetween || buttonDown)
             {
-                AddWaypointToSelectedEntities(hitResult.point);
+                AddWaypointToSelectedEntities(hitResult.point, buttonDown);
                 lastWaypointSet = hitResult.point;
             }
         }
@@ -73,6 +108,7 @@ public class PlayerControls : MonoBehaviour
     // Update our box select controller to begin a selection
     void BoxSelectBegin()
     {
+        boxSelectActive = true;
         boxSelectController.SetVisibility(true);
         RaycastHit hitResult;
         if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitResult))
@@ -94,6 +130,7 @@ public class PlayerControls : MonoBehaviour
     // Handle the box trace when we complete our selection. She may not look like much, but she's got it where it counts, kid.
     void BoxSelectEnd()
     {
+        boxSelectActive = false;
         boxSelectController.SetVisibility(false);
         Vector3 boxCastCenter = boxSelectController.boxCenterLocation;
         Vector3 boxHalfExtents = boxSelectController.selectionBoundsCenter;
@@ -120,16 +157,22 @@ public class PlayerControls : MonoBehaviour
         if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitResult))
         {
             selectedObject = hitResult.collider.gameObject;
-
-            if (selectedObject.GetComponent<WaypointHandler>() != null)    // Check if hit result is an entity object. DO THIS BETTER.
+            WaypointHandler WH = selectedObject.GetComponent<WaypointHandler>();
+            if (WH)    // Check if hit result is an entity object. DO THIS BETTER.
             {
-                // If hit object was an Entity, select it.
-                // If NOT in multi-select mode, clear all selections before selecting new object
-                if (!Input.GetButton("Multi-Select"))
-                {
-                    DeselectAll();
+                if(selectedObjects.Count == 0 && WH.entityController.IsFriendly()){
+                    // If hit object was an Entity, select it.
+                    // If NOT in multi-select mode, clear all selections before selecting new object
+                    if (!Input.GetButton("Multi-Select"))
+                    {
+                        DeselectAll();
+                    }
+                    AddSelectedObject(selectedObject);
+                }else{
+                    if(selectedObjects.Count > 0){
+                        SetSelectedEntityAttackTargets((IUnit)WH.entityController);
+                    }
                 }
-                AddSelectedObject(selectedObject);
             }
             else
             {
@@ -143,7 +186,7 @@ public class PlayerControls : MonoBehaviour
     {
         if (!selectedObjects.Contains(selectedObject))
         {
-            Debug.Log("Selecting object");
+            //Debug.Log("Selecting object");
             selectedObjects.Add(selectedObject);
             UpdateOutlineOnObject(selectedObject, true);
         }
@@ -170,7 +213,7 @@ public class PlayerControls : MonoBehaviour
     }
 
     // Adds waypoints to all the selected entities based on the input point
-    void AddWaypointToSelectedEntities(Vector3 waypoint)
+    void AddWaypointToSelectedEntities(Vector3 waypoint, bool forcePlacement)
     {
         Vector3 groupMidPoint = new Vector3();
 
@@ -188,11 +231,38 @@ public class PlayerControls : MonoBehaviour
             if (waypointHandler != null)
             {
                 Vector3 offsetFromMidpoint = entity.transform.position - groupMidPoint;
-                waypointHandler.AddWaypoint(waypoint + offsetFromMidpoint);
+                waypointHandler.AddWaypoint(waypoint + offsetFromMidpoint, forcePlacement);
             }
             else
             {
                 Debug.Log("PlayerControls.cs - Unable to add waypoint because selected entities did not have waypoint controller!");
+            }
+        }
+    }
+
+    void ClearSelectedEntityWaypoints(){
+        foreach (GameObject entity in selectedObjects){
+            WaypointHandler WH = entity.GetComponent<WaypointHandler>();
+            if (WH){
+                WH.ClearWaypoints();
+            }
+        }
+    }
+
+    void SetSelectedEntityAttackTargets(IUnit target){
+        foreach (GameObject entity in selectedObjects){
+            WaypointHandler WH = entity.GetComponent<WaypointHandler>();
+            if (WH){
+                WH.entityController.SetAttackTarget(target);
+            }
+        }
+    }
+
+    void ClearSelectedEntityAttackTargets(){
+        foreach (GameObject entity in selectedObjects){
+            WaypointHandler WH = entity.GetComponent<WaypointHandler>();
+            if (WH){
+                WH.entityController.ClearAttackTarget();
             }
         }
     }
