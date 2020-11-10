@@ -47,6 +47,11 @@ public class EntityManager : MonoBehaviour
         return entities.Find(x => x.id == id);
     }
 
+    public IEntity GetEntity(GameObject g)
+    {
+        return entities.Find(x => x.gameObject == g);
+    }
+
     void DisableServerSideEntityLogic(GameObject g)
     {
         foreach(Rigidbody r in g.GetComponentsInChildren<Rigidbody>())

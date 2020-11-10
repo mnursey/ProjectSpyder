@@ -49,6 +49,10 @@ public class EntityMovementController : MonoBehaviour, IUnit
             rBody.velocity = Vector3.zero;
         }
     }
+    public GameObject GetGameObject()
+    {
+        return gameObject;
+    }
 
     public void SetMoveTarget(Vector3 target)
     {

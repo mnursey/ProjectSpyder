@@ -70,7 +70,7 @@ public class ServerGameRunner : MonoBehaviour
                     TransitionToPlaying();
                 }
 
-                if(pm.GetPlayerCount() > 1 || true)
+                if(pm.GetActivePlayerCount() > 1 || true)
                 {
                     timer -= Time.deltaTime;
                 } else
@@ -284,6 +284,38 @@ public class ServerGameRunner : MonoBehaviour
         SendPlayerData();
     }
 
+    public void ReceiveUnitCommand(UnitCommand uc)
+    {
+        IEntity entity = em.GetEntity(uc.entityID);
+        IEntity attackTargetEntity = em.GetEntity(uc.attackTargetEntityID);
+
+        IUnit unit = entity.gameObject.GetComponent<IUnit>();
+
+        if (uc.targetWaypoint != null)
+        {
+            // Movement command
+            Vector3 movePosition = uc.targetWaypoint.GetValue();
+            unit.SetMoveTarget(uc.targetWaypoint.GetValue());
+        } else
+        {
+            // No movement command
+            unit.ClearMoveTarget();
+        }
+
+        if(attackTargetEntity != null)
+        {
+            IUnit targetUnit = attackTargetEntity.gameObject.GetComponent<IUnit>();
+
+            // Attack command
+            unit.SetAttackTarget(targetUnit);
+        }
+        else
+        {
+            // No attack command
+            unit.ClearAttackTarget();
+        }
+    }
+
     void DecreaseZone()
     {
         kzc.DecreaseZone_Server();
@@ -313,7 +345,7 @@ public class ServerGameRunner : MonoBehaviour
     bool AnyPlayersActive()
     {
         // Check if any player is online.. Includes idle players
-        return pm.GetPlayerCount() > 0;
+        return pm.GetActivePlayerCount() > 0;
     }
 
     bool AnyPlayersPlaying()

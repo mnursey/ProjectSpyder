@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum WaypointHandlerMode { OFFLINE, ONLINE }
+
 public class WaypointHandler : MonoBehaviour
 {
     [SerializeField]
@@ -19,6 +21,8 @@ public class WaypointHandler : MonoBehaviour
 
     // Detect target arrival within radius for first and last targets in a waypoint sequence
     public bool useRadiusArrivalDetection = true;
+
+    public WaypointHandlerMode mode;
 
     // References to the possible controller scripts
     public IUnit entityController;
@@ -39,7 +43,7 @@ public class WaypointHandler : MonoBehaviour
         // Set up the waypoint line renderer
         waypointLine = gameObject.AddComponent<LineRenderer>();
         waypointLine.material = Instantiate(Resources.Load<Material>(@"SelectionBox_Mat"));
-        waypointLine.positionCount = 2;
+        waypointLine.positionCount = 1;
         waypointLine.widthCurve = new AnimationCurve(new Keyframe(0, waypointLineWidth));
         waypointLine.enabled = false;
     }
@@ -56,7 +60,9 @@ public class WaypointHandler : MonoBehaviour
     {
         if(waypoints.Count >= 1)
         {
-            if(CheckArrivedAtTarget())
+            waypointLine.SetPosition(0, transform.position);
+
+            if (CheckArrivedAtTarget())
             {
                 Arrived();
             }
@@ -97,14 +103,31 @@ public class WaypointHandler : MonoBehaviour
 
         // Update controller target if there are points remaining
         if (waypoints.Count >= 1){
-            entityController.SetMoveTarget(waypoints.Peek());
+            if(mode == WaypointHandlerMode.OFFLINE)
+            {
+                entityController.SetMoveTarget(waypoints.Peek());
+            }
+
+            if (mode == WaypointHandlerMode.ONLINE)
+            {
+                ClientGameRunner.Instance.IssueComand(entityController, entityController.GetAttackTarget(), waypoints.Peek(), true);
+            }
         }
         else
         {
             // Clear target and hide line if no points remaining
             waypointLine.enabled = false;
             waypointLine.positionCount = 0;
-            entityController.ClearMoveTarget();
+
+            if (mode == WaypointHandlerMode.OFFLINE)
+            {
+                entityController.ClearMoveTarget();
+            }
+
+            if (mode == WaypointHandlerMode.ONLINE)
+            {
+                ClientGameRunner.Instance.IssueComand(entityController, entityController.GetAttackTarget(), new Vector3(), false);
+            }
         }
     }
 
@@ -119,7 +142,16 @@ public class WaypointHandler : MonoBehaviour
 
             validationPoint = waypoint + (waypoint - prevReachedWaypoint).normalized*0.1f;
 
-            entityController.SetMoveTarget(waypoint);
+            if (mode == WaypointHandlerMode.OFFLINE)
+            {
+                entityController.SetMoveTarget(waypoint);
+            }
+
+            if (mode == WaypointHandlerMode.ONLINE)
+            {
+                ClientGameRunner.Instance.IssueComand(entityController, entityController.GetAttackTarget(), waypoint, true);
+            }
+
             waypoints.Enqueue(waypoint);
 
         }else{
@@ -138,7 +170,15 @@ public class WaypointHandler : MonoBehaviour
                 RemoveLastPointFromLineRenderer();
                 
                 if(waypoints.Count == 1){
-                    entityController.SetMoveTarget(waypoint);
+                    if (mode == WaypointHandlerMode.OFFLINE)
+                    {
+                        entityController.SetMoveTarget(waypoint);
+                    }
+
+                    if (mode == WaypointHandlerMode.ONLINE)
+                    {
+                        ClientGameRunner.Instance.IssueComand(entityController, entityController.GetAttackTarget(), waypoint, true);
+                    }
                 }
             }
         }
@@ -148,7 +188,17 @@ public class WaypointHandler : MonoBehaviour
 
     public void ClearWaypoints(){
         waypoints.Clear();
-        entityController.ClearMoveTarget();
+
+        if (mode == WaypointHandlerMode.OFFLINE)
+        {
+            entityController.ClearMoveTarget();
+        }
+
+        if (mode == WaypointHandlerMode.ONLINE)
+        {
+            ClientGameRunner.Instance.IssueComand(entityController, entityController.GetAttackTarget(), new Vector3(), false);
+        }
+
         waypointLine.enabled = false;
         waypointLine.positionCount = 0;
     }

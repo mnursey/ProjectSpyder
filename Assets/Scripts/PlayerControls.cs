@@ -14,6 +14,8 @@ public interface IUnit{
     void ClearAttackTarget();
     IUnit GetAttackTarget();
 
+    GameObject GetGameObject();
+
     void ReceiveAttack(Attack atk);
     bool IsDestroyed();
     bool IsFriendly();
@@ -50,13 +52,13 @@ public class PlayerControls : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        bool shift = Input.GetKey("left shift");
-
         if(Input.GetButtonDown("Select Primary"))
         {
-            if(shift){
-                BoxSelectBegin();
+            if (!Input.GetButton("Multi-Select"))
+            {
+                DeselectAll();
             }
+            BoxSelectBegin();
         }
         
         if (Input.GetButton("Select Primary"))
@@ -184,7 +186,7 @@ public class PlayerControls : MonoBehaviour
     // Adds a single object to our selection list
     void AddSelectedObject(GameObject selectedObject)
     {
-        if (!selectedObjects.Contains(selectedObject))
+        if (!selectedObjects.Contains(selectedObject) && ClientGameRunner.Instance.IsOurUnit(selectedObject))
         {
             Debug.Log("Selecting object");
             selectedObjects.Add(selectedObject);
@@ -208,7 +210,13 @@ public class PlayerControls : MonoBehaviour
         var outlineComponent = obj.GetComponent<Outline>();
         if(outlineComponent != null)
         {
-            outlineComponent.enabled = isObjectSelected;
+            if(isObjectSelected)
+            {
+                outlineComponent.OutlineColor = Color.yellow;
+            } else
+            {
+                outlineComponent.OutlineColor = Color.white;
+            }
         }
     }
 

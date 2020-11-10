@@ -166,8 +166,8 @@ public class ServerController : MonoBehaviour
                 Instance.RemoveClient(info.connection, reason, closeDebug);
                 Debug.Log(String.Format("Client disconnected from server - ID: {0}, IP: {1}", info.connection, info.connectionInfo.address.GetIP()));
 
-                // Remove from player manager
-                Instance.sgr.pm.RemovePlayer(info.connection);
+                // Set active to false in player manager
+                Instance.sgr.pm.GetPlayer(info.connection).active = false;
 
                 break;
         }
@@ -203,6 +203,15 @@ public class ServerController : MonoBehaviour
                     string username = (string)NetworkingMessageTranslator.ByteArrayToObject(msg.content);
 
                     sgr.pm.UpdateUsername(clientID, username);
+
+                    break;
+
+                case NetworkingMessageType.USER_COMMANDS:
+                    UnitCommand uc = (UnitCommand)NetworkingMessageTranslator.ByteArrayToObject(msg.content);
+
+                    Debug.Log("Server recieved unit command: " + uc.entityID);
+
+                    sgr.ReceiveUnitCommand(uc);
 
                     break;
             }

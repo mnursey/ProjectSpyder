@@ -69,6 +69,15 @@ public static class NetworkingMessageTranslator
         return ToByteArray(nm);
     }
 
+    public static byte[] GenerateUnitCommandNetworkingMessage(UnitCommand uc)
+    {
+        NetworkingMessage nm = new NetworkingMessage();
+        nm.type = NetworkingMessageType.USER_COMMANDS;
+        nm.content = ToByteArray(uc);
+
+        return ToByteArray(nm);
+    }
+
     public static byte[] GeneratePlayerStateNetworkingMessage(List<PlayerState> ps, int frame)
     {
         NetworkingMessage nm = new NetworkingMessage();

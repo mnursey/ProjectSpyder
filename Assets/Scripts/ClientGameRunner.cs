@@ -1,12 +1,14 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public enum GameStateEnum { IDLE, JOINING, WAITING, PLAYING, ENDING }
 
 public class ClientGameRunner : MonoBehaviour
 {
-    EntityManager em;
+    public EntityManager em;
     PlayerManager pm;
     ClientController cc;
     KillzoneController kzc;
@@ -27,7 +29,20 @@ public class ClientGameRunner : MonoBehaviour
     List<EntityData> incomingEntityData;
 
     public uint playerID;
-    public string username;
+    public Text usernameField;
+
+    public static ClientGameRunner Instance;
+
+    private void Awake()
+    {
+        if(Instance == null )
+        {
+            Instance = this;
+        } else
+        {
+            Debug.LogError("More than one Client Game Runner");
+        }
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -44,6 +59,7 @@ public class ClientGameRunner : MonoBehaviour
         UpdateGameState();
         UpdateEntities();
         UpdatePlayers();
+        UpdateEntityOutlineColour();
 
         switch (state)
         {
@@ -119,7 +135,7 @@ public class ClientGameRunner : MonoBehaviour
     public void ConnectToGame()
     {
         Reset();
-        cc.JoinGame(username, OnConnect, OnDisconnect, OnReject);
+        cc.JoinGame(usernameField.text, OnConnect, OnDisconnect, OnReject);
         TransitionToJoining();
 
         // TODO
@@ -164,9 +180,62 @@ public class ClientGameRunner : MonoBehaviour
         LeaveServer();
     }
 
-    void SendCommands()
+    public bool IsOurUnit(GameObject unit)
     {
+        bool result = false;
 
+        IEntity entity = em.GetEntity(unit);
+
+        if(entity != null)
+        {
+            result = pm.GetPlayer(playerID).controlledEntities.Contains(entity.id);
+        }
+
+        return result;
+    }
+
+    void UpdateEntityOutlineColour()
+    {
+        foreach(IEntity e in em.entities)
+        {
+            Outline o = e.gameObject.GetComponent<Outline>();
+
+            if(o != null)
+            {
+                uint ownerPlayerID = 0;
+                foreach(Player p in pm.players)
+                {
+                    if(p.controlledEntities.Contains(e.id))
+                    {
+                        ownerPlayerID = p.id;
+                        break;
+                    }
+                }
+
+                if(ownerPlayerID == 0)
+                {
+                    // neutral
+                    o.OutlineColor = Color.blue;
+                } else if(ownerPlayerID == playerID)
+                {
+                    // ours
+                    // let player controls handle this case...
+                    // Todo... redo this ^ 
+
+                    // Hacky fix...
+                    // This fixes the case where the units are spawned then the CGR receives its playerID
+                    if (o.OutlineColor == Color.blue)
+                    {
+                        o.OutlineColor = Color.white;
+                    }
+                }
+                else
+                {
+                    // enemy
+                    o.OutlineColor = Color.red;
+                }
+            }
+        }
     }
 
     void SendUsername()
@@ -174,35 +243,46 @@ public class ClientGameRunner : MonoBehaviour
         // Sends username to the server
         byte[] data;
 
-        data = NetworkingMessageTranslator.GenerateUsernameNetworkingMessage(username);
+        data = NetworkingMessageTranslator.GenerateUsernameNetworkingMessage(usernameField.text);
 
         // Reliable because we only send once.
         cc.Send(data, Valve.Sockets.SendFlags.Reliable, null);
     }
 
-    void MoveCommand()
+    public void IssueComand(IUnit unit, IUnit attackTarget, Vector3 moveTarget, bool moveTargetActive)
     {
+        //ClientGameRunner.Instance.IssueComand(ClientGameRunner.Instance.em.GetEntity(this.gameObject), ClientGameRunner.Instance.em.GetEntity(entityController.GetAttackTarget().GetGameObject()), waypoints.Peek(), true);
+
+        ushort entityID = ClientGameRunner.Instance.em.GetEntity(unit.GetGameObject()).id;
+        ushort attackTargetEntityID = 0;
+
         // TODO
+        // Refactor this null checking
+        if(unit.GetAttackTarget() != null && unit.GetAttackTarget().GetGameObject() != null && ClientGameRunner.Instance.em.GetEntity(unit.GetAttackTarget().GetGameObject()) != null)
+        {
+            attackTargetEntityID = ClientGameRunner.Instance.em.GetEntity(unit.GetAttackTarget().GetGameObject()).id;
+        }
+
+        SVector3 mt = null;
+
+        if(moveTargetActive)
+        {
+            mt = new SVector3(moveTarget);
+        }
+
+        UnitCommand uc = new UnitCommand(entityID, attackTargetEntityID, mt);
+
+        SendUnitCommand(uc);
     }
 
-    void AttackCommand()
+    public void SendUnitCommand(UnitCommand uc)
     {
-        // TODO
-    }
+        byte[] data;
 
-    void StopCommand()
-    {
-        // TODO
-    }
+        data = NetworkingMessageTranslator.GenerateUnitCommandNetworkingMessage(uc);
 
-    void EnterCommand()
-    {
-        // TODO
-    }
-
-    void QuitGame()
-    {
-        // TODO
+        // Reliable because we only send once.
+        cc.Send(data, Valve.Sockets.SendFlags.Reliable, null);
     }
 
     public void ReceiveEntityState(List<EntityState> es, int frame)
@@ -388,5 +468,22 @@ public class ClientGameRunner : MonoBehaviour
     {
         cc.Disconnect();
         Reset();
+    }
+}
+
+[Serializable]
+public class UnitCommand
+{
+    public ushort entityID;
+
+    public ushort attackTargetEntityID;
+
+    public SVector3 targetWaypoint;
+
+    public UnitCommand(ushort entityID, ushort attackTargetEntityID, SVector3 targetWaypoint)
+    {
+        this.entityID = entityID;
+        this.attackTargetEntityID = attackTargetEntityID;
+        this.targetWaypoint = targetWaypoint;
     }
 }

@@ -40,9 +40,19 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    public int GetPlayerCount()
+    public int GetActivePlayerCount()
     {
-        return players.Count;
+        int count = 0;
+
+        foreach (Player p in players)
+        {
+            if (p.active)
+            {
+                count++;
+            }
+        }
+
+        return count;
     }
 
     public int GetPlayingPlayerCount()
@@ -53,7 +63,7 @@ public class PlayerManager : MonoBehaviour
 
         foreach(Player p in players)
         {
-            if(p.controlledEntities.Count > 0)
+            if(p.controlledEntities.Count > 0 && p.active)
             {
                 count++;
             }
@@ -118,6 +128,7 @@ public class Player {
     public string username;
 
     public List<int> controlledEntities = new List<int>();
+    public bool active = true;
 
     public Player(uint id)
     {

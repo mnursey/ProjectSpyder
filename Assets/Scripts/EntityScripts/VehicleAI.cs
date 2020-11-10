@@ -43,6 +43,11 @@ public class VehicleAI : MonoBehaviour, IUnit
     	}
     }
 
+    public GameObject GetGameObject()
+    {
+        return gameObject;
+    }
+
     public void SetMoveTarget(Vector3 target)
     {
         movementTarget = target;
