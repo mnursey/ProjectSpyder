@@ -260,6 +260,7 @@ GameObject:
   - component: {fileID: 2872553020588073966}
   - component: {fileID: 4039394739299553944}
   - component: {fileID: 4039394739299553921}
+  - component: {fileID: 5726731604993618253}
   m_Layer: 9
   m_Name: Jeep
   m_TagString: Untagged
@@ -435,6 +436,30 @@ MonoBehaviour:
   precomputeOutline: 0
   bakeKeys: []
   bakeValues: []
+--- !u!114 &5726731604993618253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2872553020588073967}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4581b428bbb37145bfbe4b8f2cd1d3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  explosionForce: 100
+  explosionRadius: 4
+  fragmentPrefabs:
+  - {fileID: 1470831417794624657, guid: 091dde04f6e3fae46a8688c69b4a38e2, type: 3}
+  - {fileID: 4610385577030208098, guid: 37da0122a91ba014f8f3bd7758b936f6, type: 3}
+  - {fileID: 8830454863893564579, guid: 701681974cce32d499f953c424662660, type: 3}
+  - {fileID: 7406218163287400630, guid: 9645f14b517e9794584174f1d35248b6, type: 3}
+  fragmentPositionOffsets:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
 --- !u!1 &3106412892073334225
 GameObject:
   m_ObjectHideFlags: 0

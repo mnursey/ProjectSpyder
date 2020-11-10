@@ -1,0 +1,134 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1951099222033051113
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1177799927252809555}
+  - component: {fileID: 2879974301957454070}
+  - component: {fileID: 5433887471537212}
+  - component: {fileID: 1716675983997171722}
+  - component: {fileID: 1716675983997171733}
+  - component: {fileID: -4420169536287368764}
+  m_Layer: 0
+  m_Name: GunJeepDestroyed_8
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1177799927252809555
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1951099222033051113}
+  m_LocalRotation: {x: 0.00000008146035, y: 0, z: -0, w: 1}
+  m_LocalPosition: {x: -15.05, y: -1.08704245e-16, z: 4.07}
+  m_LocalScale: {x: 10.505211, y: 10.101166, z: 6.0606995}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &2879974301957454070
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1951099222033051113}
+  m_Mesh: {fileID: -4541232942294329851, guid: 3b87532123ea5fc4f92863e9e765f0a4, type: 3}
+--- !u!23 &5433887471537212
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1951099222033051113}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: -7846829969535828162, guid: 3b87532123ea5fc4f92863e9e765f0a4, type: 3}
+  - {fileID: -4359818510756747556, guid: 3b87532123ea5fc4f92863e9e765f0a4, type: 3}
+  - {fileID: -8626307248111201755, guid: 3b87532123ea5fc4f92863e9e765f0a4, type: 3}
+  - {fileID: -461964213850424473, guid: 3b87532123ea5fc4f92863e9e765f0a4, type: 3}
+  - {fileID: 8718386454472222403, guid: 3b87532123ea5fc4f92863e9e765f0a4, type: 3}
+  - {fileID: 6404835698664604820, guid: 3b87532123ea5fc4f92863e9e765f0a4, type: 3}
+  - {fileID: 3881143355732699384, guid: 3b87532123ea5fc4f92863e9e765f0a4, type: 3}
+  - {fileID: 5822119252765610718, guid: 3b87532123ea5fc4f92863e9e765f0a4, type: 3}
+  - {fileID: -7100422812945433524, guid: 3b87532123ea5fc4f92863e9e765f0a4, type: 3}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!54 &1716675983997171722
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1951099222033051113}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!65 &1716675983997171733
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1951099222033051113}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.06678833, y: 0.10624, z: 0.23034559}
+  m_Center: {x: 0.016605832, y: 0.09311997, z: -0.0651728}
+--- !u!114 &-4420169536287368764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1951099222033051113}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc9f57e674eda0e4eb4c213b55a550de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lifespan: 5
