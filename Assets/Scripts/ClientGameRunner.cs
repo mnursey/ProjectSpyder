@@ -249,19 +249,10 @@ public class ClientGameRunner : MonoBehaviour
         cc.Send(data, Valve.Sockets.SendFlags.Reliable, null);
     }
 
-    public void IssueComand(IUnit unit, IUnit attackTarget, Vector3 moveTarget, bool moveTargetActive)
+    public void IssueComand(IUnit unit, Vector3 moveTarget, bool moveTargetActive)
     {
-        //ClientGameRunner.Instance.IssueComand(ClientGameRunner.Instance.em.GetEntity(this.gameObject), ClientGameRunner.Instance.em.GetEntity(entityController.GetAttackTarget().GetGameObject()), waypoints.Peek(), true);
-
+        // HANDLE MOVEMENT
         ushort entityID = ClientGameRunner.Instance.em.GetEntity(unit.GetGameObject()).id;
-        ushort attackTargetEntityID = 0;
-
-        // TODO
-        // Refactor this null checking
-        if(unit.GetAttackTarget() != null && unit.GetAttackTarget().GetGameObject() != null && ClientGameRunner.Instance.em.GetEntity(unit.GetAttackTarget().GetGameObject()) != null)
-        {
-            attackTargetEntityID = ClientGameRunner.Instance.em.GetEntity(unit.GetAttackTarget().GetGameObject()).id;
-        }
 
         SVector3 mt = null;
 
@@ -270,7 +261,27 @@ public class ClientGameRunner : MonoBehaviour
             mt = new SVector3(moveTarget);
         }
 
-        UnitCommand uc = new UnitCommand(entityID, attackTargetEntityID, mt);
+        UnitCommand uc = new UnitCommand(entityID, mt);
+
+        SendUnitCommand(uc);
+    }
+
+    public void IssueComand(IUnit unit, IUnit attackTarget)
+    {
+        // HANDLE ATTACK
+        ushort entityID = ClientGameRunner.Instance.em.GetEntity(unit.GetGameObject()).id;
+        ushort attackTargetEntityID = 0;
+
+        // TODO
+        // Refactor this null checking
+        if (attackTarget != null && attackTarget.GetGameObject() != null && ClientGameRunner.Instance.em.GetEntity(attackTarget.GetGameObject()) != null)
+        {
+            attackTargetEntityID = ClientGameRunner.Instance.em.GetEntity(attackTarget.GetGameObject()).id;
+        }
+
+        Debug.Log("Attacking " + attackTargetEntityID);
+
+        UnitCommand uc = new UnitCommand(entityID, attackTargetEntityID);
 
         SendUnitCommand(uc);
     }
@@ -480,10 +491,18 @@ public class UnitCommand
 
     public SVector3 targetWaypoint;
 
-    public UnitCommand(ushort entityID, ushort attackTargetEntityID, SVector3 targetWaypoint)
+    public bool movementUpdate = true;
+
+    public UnitCommand(ushort entityID, SVector3 targetWaypoint)
+    {
+        this.entityID = entityID;
+        this.targetWaypoint = targetWaypoint;
+    }
+
+    public UnitCommand(ushort entityID, ushort attackTargetEntityID)
     {
         this.entityID = entityID;
         this.attackTargetEntityID = attackTargetEntityID;
-        this.targetWaypoint = targetWaypoint;
+        movementUpdate = false;
     }
 }
