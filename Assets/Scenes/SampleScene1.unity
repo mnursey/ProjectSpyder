@@ -200,7 +200,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 059a9ede3472213478335f213b31f6ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pPrefab1: {fileID: 5658539257918212526, guid: a4c20e507554f6d4a91c4f1ea743b4ad,
+  pPrefab1: {fileID: 5658539257918212526, guid: 39f5289f4dd98ec4990cdfdefefe4a40,
     type: 3}
   pPrefab2: {fileID: 5658539257918212526, guid: 39f5289f4dd98ec4990cdfdefefe4a40,
     type: 3}
