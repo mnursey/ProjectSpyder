@@ -186,11 +186,17 @@ public class ServerGameRunner : MonoBehaviour
 
     void SpawnInitialEntities(Player p, int spawnPos)
     {
+        List<EntityType> startingTypes = new List<EntityType> { 
+            EntityType.MG_JEEP, 
+            EntityType.TANK,
+            EntityType.ANTI_TANK,
+            EntityType.RAM_TRUCK,
+            EntityType.MECH
+        };
+
         for(int i = 0; i < 5; ++i)
         {
-            // TODO
-            // Change this to spawn 5 soldiers
-            IEntity e = em.CreateEntity(EntityType.MG_JEEP);
+            IEntity e = em.CreateEntity(startingTypes[i]);
             p.controlledEntities.Add(e.id);
 
             e.gameObject.transform.position = spawnPositions[spawnPos].transform.position + new Vector3(i * 3f, 0f, 0f);

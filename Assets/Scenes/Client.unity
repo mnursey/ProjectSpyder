@@ -2736,6 +2736,13 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 2872553020588073967, guid: bd0f58b98ed111d48bf28fd1777c871f, type: 3}
   - {fileID: 5648534046795121577, guid: d5721583ef63e6c4f9c979ec398d2e16, type: 3}
+  - {fileID: 2924829198082483884, guid: bc3ca4351797a144cb02bb6d5a4c8ea0, type: 3}
+  - {fileID: 1035869809270247508, guid: 664538abc6bf92342bec37b1f280fc57, type: 3}
+  - {fileID: 5696870486744596358, guid: 5dbb8425118bec84dabf65e8e0d724cd, type: 3}
+  - {fileID: 2519360454502335346, guid: 26f3dcb4851e3ca4dae072a2be50158a, type: 3}
+  - {fileID: 7616323699062288965, guid: e8313108fc68b364886ce8197c6e3511, type: 3}
+  - {fileID: 5648534046795121577, guid: d5721583ef63e6c4f9c979ec398d2e16, type: 3}
+  - {fileID: 5648534046795121577, guid: d5721583ef63e6c4f9c979ec398d2e16, type: 3}
   mode: 0
   bulletPrefab1: {fileID: 5658539257918212526, guid: a4c20e507554f6d4a91c4f1ea743b4ad,
     type: 3}
