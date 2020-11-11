@@ -23,6 +23,19 @@ public class ServerGameRunner : MonoBehaviour
 
     public int frame = 0;
 
+    public static ServerGameRunner Instance;
+
+    private void Awake()
+    {
+        if(Instance == null)
+        {
+            Instance = this;
+        } else
+        {
+            Debug.LogError("More than one Server Game Runner");
+        }
+    }
+
     void Start()
     {
         em = GetComponent<EntityManager>();
@@ -122,6 +135,7 @@ public class ServerGameRunner : MonoBehaviour
         Debug.Log("Transitioned to waiting state");
         state = GameStateEnum.WAITING;
         timer = waitingTime;
+        ResetGame();
     }
 
     void TransitionToIdle()
@@ -172,11 +186,11 @@ public class ServerGameRunner : MonoBehaviour
         {
             // TODO
             // Change this to spawn 5 soldiers
-            IEntity e = em.CreateEntity(EntityType.JEEP);
+            IEntity e = em.CreateEntity(EntityType.MG_JEEP);
             p.controlledEntities.Add(e.id);
 
             // TODO Set positions of units to a spawn position
-            e.gameObject.transform.position = new Vector3(i * 10f, 0f, 0f);
+            e.gameObject.transform.position = new Vector3(i * 10f, 30f, 0f);
         }
     }
 
@@ -287,32 +301,41 @@ public class ServerGameRunner : MonoBehaviour
     public void ReceiveUnitCommand(UnitCommand uc)
     {
         IEntity entity = em.GetEntity(uc.entityID);
-        IEntity attackTargetEntity = em.GetEntity(uc.attackTargetEntityID);
-
         IUnit unit = entity.gameObject.GetComponent<IUnit>();
 
-        if (uc.targetWaypoint != null)
+        if (uc.movementUpdate)
         {
-            // Movement command
-            Vector3 movePosition = uc.targetWaypoint.GetValue();
-            unit.SetMoveTarget(uc.targetWaypoint.GetValue());
+            // Update movement
+            if (uc.targetWaypoint != null)
+            {
+                // Movement command
+                Vector3 movePosition = uc.targetWaypoint.GetValue();
+                unit.SetMoveTarget(uc.targetWaypoint.GetValue());
+            }
+            else
+            {
+                // No movement command
+                unit.ClearMoveTarget();
+            }
+
         } else
         {
-            // No movement command
-            unit.ClearMoveTarget();
-        }
+            // Update attack
+            IEntity attackTargetEntity = em.GetEntity(uc.attackTargetEntityID);
+            Debug.Log("Client Requested to Attack " + uc.attackTargetEntityID);
 
-        if(attackTargetEntity != null)
-        {
-            IUnit targetUnit = attackTargetEntity.gameObject.GetComponent<IUnit>();
-
-            // Attack command
-            unit.SetAttackTarget(targetUnit);
-        }
-        else
-        {
-            // No attack command
-            unit.ClearAttackTarget();
+            if (attackTargetEntity != null)
+            {
+                IUnit targetUnit = attackTargetEntity.gameObject.GetComponent<IUnit>();
+                Debug.Log("Found target unit");
+                // Attack command
+                unit.SetAttackTarget(targetUnit);
+            }
+            else
+            {
+                // No attack command
+                unit.ClearAttackTarget();
+            }
         }
     }
 
@@ -328,18 +351,36 @@ public class ServerGameRunner : MonoBehaviour
 
     public void ResetGame()
     {
-        frame = 0;
         em.Reset();
-        
-        // Todo
+
         // Reset zone size
+        kzc.Init_Server(zoneMaxSize, 0.0f, 1, zoneCloseRate);
     }
 
     bool GameFinished()
     {
-        // TODO
-        // Check if one player has units alive
-        return false;
+        int numAlivePlayers = 0;
+
+        foreach(Player p in pm.players)
+        {
+            foreach(ushort u in p.controlledEntities)
+            {
+                if(em.GetEntity(u) != null && em.GetEntity(u).health > 0)
+                {
+                    numAlivePlayers++;
+                    break;
+                }
+            }
+        }
+
+        if(numAlivePlayers <= 1)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     bool AnyPlayersActive()

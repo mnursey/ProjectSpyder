@@ -13,7 +13,7 @@ public enum AttackStyle{
 public class VehicleAI : MonoBehaviour, IUnit
 {
 	Rigidbody rb;
-	VehicleController controller;
+	public VehicleController controller;
 
 	[Header("Car Inputs")]
     public float steeringInput = 0.0f;
@@ -33,9 +33,9 @@ public class VehicleAI : MonoBehaviour, IUnit
     public bool manualControl;
     public AttackStyle atkStyle;
 
-    float gunCooldown;
+    public float gunCooldown;
 
-    private IUnit attackTarget = null;
+    public IUnit attackTarget = null;
     private Vector3 movementTarget;
     private bool hasMovementTarget = false;
 
@@ -78,7 +78,14 @@ public class VehicleAI : MonoBehaviour, IUnit
     }
 
     public void ReceiveAttack(Attack atk){
-    	controller.ReceiveAttack(atk);
+
+
+        if(controller == null)
+        {
+            Debug.LogError("Controller is null");
+        }
+
+        controller.ReceiveAttack(atk);
     }
 
     public bool IsDestroyed(){
@@ -86,7 +93,7 @@ public class VehicleAI : MonoBehaviour, IUnit
     }
 
     public bool IsFriendly(){
-        return true;
+        return ClientGameRunner.Instance.IsOurUnit(gameObject);
     }
 
     public Vector3 GetPos(){
@@ -101,8 +108,13 @@ public class VehicleAI : MonoBehaviour, IUnit
     	if(hasMovementTarget){
     		effectiveMovementTarget = movementTarget.DiscardY();
     	}
-    		
-    	if(attackTarget != null){
+
+        if (attackTarget != null && attackTarget.IsDestroyed())
+        {
+            attackTarget = null;
+        }
+
+        if (attackTarget != null){
     		Vector2 targetPos = attackTarget.GetPos().DiscardY();
 
     		switch(atkStyle){
@@ -176,25 +188,28 @@ public class VehicleAI : MonoBehaviour, IUnit
 	}	
 
 	void ShootIfAble(){
-		if(gunCooldown > 0) return;
+        // Return if client
+        if (ClientGameRunner.Instance != null)
+            return;
 
+		if(gunCooldown > 0) return;
 		Vector3 targetDisp = attackTarget.GetPos() - rb.position;
 		float targetRange = targetDisp.magnitude;
 		if(targetRange > controller.gunRange) return;
 
-		if(atkStyle == AttackStyle.FixedGun){
+        if (atkStyle == AttackStyle.FixedGun){
 			if(Vector2.Angle(transform.forward.DiscardY(), (attackTarget.GetPos() - rb.position).DiscardY()) > 1) return;
 		}else if(atkStyle == AttackStyle.TurretGun){
 			//Debug.Log(-controller.turret.localEulerAngles.y - targetTurretAngle);
 			if(Mathf.Abs(-controller.turret.localEulerAngles.y - targetTurretAngle)%360 > 1) return;
 		}else{
-			return;
+            return;
 		}
 
 		Vector3 raycastOrigin = rb.position;
 		if(Physics.Raycast(raycastOrigin, attackTarget.GetPos() - raycastOrigin, targetRange, LayerMask.GetMask("Terrain"))){
 			//Debug.Log(gameObject.name + "blocked by terrain.");
-			GameObject.Find("Test Ball").transform.position = attackTarget.GetPos();
+			//GameObject.Find("Test Ball").transform.position = attackTarget.GetPos();
 			return;
 		} 
 
@@ -210,7 +225,9 @@ public class VehicleAI : MonoBehaviour, IUnit
 			hitPoint = attackTarget.GetPos() - targetDisp.normalized;
 		}
 
-		GameObject.Find("Test Ball").transform.position = hitPoint;
+        //GameObject.Find("Test Ball").transform.position = hitPoint;
+
+        Debug.DrawLine(attackTarget.GetGameObject().transform.position, transform.position);
 
 		attackTarget.ReceiveAttack(new Attack(controller.gunDamage, 
 								   DamageType.Ballistic, 
@@ -219,6 +236,7 @@ public class VehicleAI : MonoBehaviour, IUnit
 								   controller.gunExplosionRadius));
 
 		gunCooldown = 1/controller.fireRate;
+        ServerGameRunner.Instance.em.GetEntity(this.gameObject).shot = true;
 	}
 
 	void GetKeyboardInputs(){

@@ -104,6 +104,7 @@ public class ClientGameRunner : MonoBehaviour
         Debug.Log("Transitioned to waiting state");
         state = GameStateEnum.WAITING;
         MenuController.Instance.GoToWaitMenu();
+        ResetGame();
     }
 
     void TransitionToJoining()
@@ -419,7 +420,8 @@ public class ClientGameRunner : MonoBehaviour
                     break;
             }
 
-            state = incomingGameState.state;
+            if(incomingGameState != null)
+                state = incomingGameState.state;
         }
 
         if(incomingGameState != null)

@@ -110,7 +110,7 @@ public class WaypointHandler : MonoBehaviour
 
             if (mode == WaypointHandlerMode.ONLINE)
             {
-                ClientGameRunner.Instance.IssueComand(entityController, entityController.GetAttackTarget(), waypoints.Peek(), true);
+                ClientGameRunner.Instance.IssueComand(entityController, waypoints.Peek(), true);
             }
         }
         else
@@ -126,7 +126,7 @@ public class WaypointHandler : MonoBehaviour
 
             if (mode == WaypointHandlerMode.ONLINE)
             {
-                ClientGameRunner.Instance.IssueComand(entityController, entityController.GetAttackTarget(), new Vector3(), false);
+                ClientGameRunner.Instance.IssueComand(entityController, new Vector3(), false);
             }
         }
     }
@@ -149,7 +149,7 @@ public class WaypointHandler : MonoBehaviour
 
             if (mode == WaypointHandlerMode.ONLINE)
             {
-                ClientGameRunner.Instance.IssueComand(entityController, entityController.GetAttackTarget(), waypoint, true);
+                ClientGameRunner.Instance.IssueComand(entityController, waypoint, true);
             }
 
             waypoints.Enqueue(waypoint);
@@ -177,7 +177,7 @@ public class WaypointHandler : MonoBehaviour
 
                     if (mode == WaypointHandlerMode.ONLINE)
                     {
-                        ClientGameRunner.Instance.IssueComand(entityController, entityController.GetAttackTarget(), waypoint, true);
+                        ClientGameRunner.Instance.IssueComand(entityController, waypoint, true);
                     }
                 }
             }
@@ -196,7 +196,7 @@ public class WaypointHandler : MonoBehaviour
 
         if (mode == WaypointHandlerMode.ONLINE)
         {
-            ClientGameRunner.Instance.IssueComand(entityController, entityController.GetAttackTarget(), new Vector3(), false);
+            ClientGameRunner.Instance.IssueComand(entityController, new Vector3(), false);
         }
 
         waypointLine.enabled = false;

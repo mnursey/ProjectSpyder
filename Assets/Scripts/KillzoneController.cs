@@ -71,6 +71,8 @@ public class KillzoneController : MonoBehaviour
             Vector3 entityPos = entity.gameObject.transform.position;
             if(entityPos.magnitude >= radius)
             {
+                VehicleController vc = entity.gameObject.GetComponent<VehicleController>();
+                vc.HP -= damagePerSecond;
                 //entity.ApplyDamage(damagePerSecond * Time.deltaTime);
             }
         }

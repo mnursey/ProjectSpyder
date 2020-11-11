@@ -4,7 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-class VehicleController : MonoBehaviour {
+public class VehicleController : MonoBehaviour {
 
 	public Rigidbody rb;
 	public Transform turret;

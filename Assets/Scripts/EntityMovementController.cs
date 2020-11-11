@@ -90,7 +90,7 @@ public class EntityMovementController : MonoBehaviour, IUnit
     }
 
     public bool IsFriendly(){
-        return true;
+        return ClientGameRunner.Instance.IsOurUnit(gameObject);
     }
 
     public Vector3 GetPos(){

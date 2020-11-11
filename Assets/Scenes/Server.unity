@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 0
+  m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -278,7 +278,8 @@ MonoBehaviour:
   idCounter: 0
   entityPrefabs:
   - {fileID: 0}
-  - {fileID: 2293330420283553863, guid: d2c004352c9c9984b80c63f7d491d49a, type: 3}
+  - {fileID: 2872553020588073967, guid: bd0f58b98ed111d48bf28fd1777c871f, type: 3}
+  - {fileID: 5648534046795121577, guid: d5721583ef63e6c4f9c979ec398d2e16, type: 3}
   mode: 1
 --- !u!114 &453921579
 MonoBehaviour:
@@ -295,7 +296,7 @@ MonoBehaviour:
   em: {fileID: 0}
   pm: {fileID: 0}
   timer: 0
-  waitingTime: 5
+  waitingTime: 30
   endTime: 15
   zoneMaxSize: 450
   zoneCloseRate: 0.5

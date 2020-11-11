@@ -175,6 +175,31 @@ public class EntityManager : MonoBehaviour
             UpdateEntityPosRot(e, es.pos.GetValue(), Quaternion.Euler(es.rot.GetValue()));
             e.health = es.health;
             e.attackTarget = es.attackTarget;
+
+            IUnit unit = e.gameObject.GetComponent<IUnit>();
+            if(unit != null)
+            {
+                if(es.shot)
+                {
+                    // TODO
+                    // IF SHOT THIS FRAME SPAWN SHOOTING VISUALS
+                }
+
+                // Update unit health 
+                e.gameObject.GetComponent<VehicleController>().HP = e.health;
+
+                // Update attack target on vehicle logic
+                IEntity attackTarget = GetEntity(e.attackTarget);
+                if(attackTarget != null)
+                {
+                    Debug.Log("found entity attack target " + attackTarget);
+                    IUnit targetUniit = attackTarget.gameObject.GetComponent<IUnit>();
+                    if(targetUniit != null)
+                    {
+                        unit.SetAttackTarget(targetUniit);
+                    }
+                }
+            }
         }
     }
 
@@ -241,10 +266,10 @@ public interface IEntity
     ushort health { get; set; }
     ushort attackTarget { get; set; }
 
+    bool shot { get; set; }
+
     EntityData GetData();
-    EntityState GetState();
-    bool ShotThisFrame();
-}
+    EntityState GetState();}
 
 [Serializable]
 public class GenericEntity : IEntity
@@ -270,11 +295,18 @@ public class GenericEntity : IEntity
         set => _entityPrefabIndex = value;
     }
 
-    private ushort _health;
+    private ushort _health = 1;
     public ushort health
     {
         get => _health;
         set => _health = value;
+    }
+
+    private bool _shot;
+    public bool shot
+    {
+        get => _shot;
+        set => _shot = value;
     }
 
     private ushort _attackTarget;
@@ -291,13 +323,34 @@ public class GenericEntity : IEntity
 
     public EntityState GetState()
     {
-        return new EntityState(_id, _gameObject.transform.position, _gameObject.transform.eulerAngles, _health, _attackTarget);
-    }
+        // Update unit health 
+        int HP = _gameObject.GetComponent<VehicleController>().HP;
+        if (HP < 0) HP = 0; 
 
-    public bool ShotThisFrame()
-    {
-        // TODO
-        return false;
+        _health = (ushort)HP;
+
+        IUnit u = _gameObject.GetComponent<IUnit>();
+
+        if(u != null)
+        {
+            IUnit a = u.GetAttackTarget();
+            if(a != null)
+            {
+                GameObject ag = a.GetGameObject();
+                IEntity ae = EntityManager.Instance.GetEntity(ag);
+                if(ae != null)
+                {
+                    _attackTarget = ae.id;
+                }
+            }
+        }
+
+        EntityState s = new EntityState(_id, _gameObject.transform.position, _gameObject.transform.eulerAngles, _health, _attackTarget);
+
+        s.shot = _shot;
+        _shot = false;
+
+        return s;
     }
 }
 
@@ -311,7 +364,6 @@ public class EntityData
     public SVector3 pos;
     public SVector3 rot;
     public ushort health;
-
     public EntityData () { }
 
     public EntityData(ushort id, ushort entityPrefabIndex, Vector3 pos, Vector3 rot, ushort health)
@@ -334,6 +386,7 @@ public class EntityState
     public SVector3 rot;
     public ushort health;
     public ushort attackTarget;
+    public bool shot;
 
     public EntityState() { }
 

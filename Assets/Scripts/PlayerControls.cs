@@ -70,19 +70,30 @@ public class PlayerControls : MonoBehaviour
 
         if (Input.GetButtonUp("Select Primary"))
         {
+            // Selects all friendly units
             if(boxSelectActive){
                 BoxSelectEnd();
-            }else{
-                SelectIndividual();
             }
         }
 
-        if(Input.GetButtonDown("Select Secondary"))
+        if(Input.GetButton("Multi-Select"))
         {
-            SetWaypoint(true);
-        }else if(Input.GetButton("Select Secondary"))
+            // Assigns attack target
+            if(Input.GetButtonDown("Select Secondary"))
+            {
+                bool hitEnempy = SetAttackTarget();
+            }
+        } else
         {
-            SetWaypoint(false);
+            if (Input.GetButtonDown("Select Secondary"))
+            {
+
+                SetWaypoint(true);
+            }
+            else if (Input.GetButton("Select Secondary"))
+            {
+                SetWaypoint(false);
+            }
         }
 
         if(Input.GetKeyDown("space"))
@@ -152,8 +163,9 @@ public class PlayerControls : MonoBehaviour
     }
 
     // Handle the ray casting portion of selecting entities using individual (one-by-one) selection
-    void SelectIndividual()
+    bool SetAttackTarget()
     {
+        bool hitEnemy = false;
         RaycastHit hitResult;
         GameObject selectedObject;
         if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitResult))
@@ -162,25 +174,15 @@ public class PlayerControls : MonoBehaviour
             WaypointHandler WH = selectedObject.GetComponent<WaypointHandler>();
             if (WH)    // Check if hit result is an entity object. DO THIS BETTER.
             {
-                if(selectedObjects.Count == 0 && WH.entityController.IsFriendly()){
-                    // If hit object was an Entity, select it.
-                    // If NOT in multi-select mode, clear all selections before selecting new object
-                    if (!Input.GetButton("Multi-Select"))
-                    {
-                        DeselectAll();
-                    }
-                    AddSelectedObject(selectedObject);
-                }else{
-                    if(selectedObjects.Count > 0){
-                        SetSelectedEntityAttackTargets((IUnit)WH.entityController);
-                    }
+                if(selectedObjects.Count > 0){
+                    SetSelectedEntityAttackTargets((IUnit)WH.entityController);
+                    hitEnemy = true;
+                    Debug.Log("Hit with raycast enemy");
                 }
             }
-            else
-            {
-                DeselectAll();
-            }
         }
+
+        return hitEnemy;
     }
 
     // Adds a single object to our selection list
@@ -199,7 +201,10 @@ public class PlayerControls : MonoBehaviour
     {
         foreach (GameObject obj in selectedObjects)
         {
-            UpdateOutlineOnObject(obj, false);
+            if(obj != null)
+            {
+                UpdateOutlineOnObject(obj, false);
+            }
         }
         selectedObjects.Clear();
     }
@@ -207,6 +212,10 @@ public class PlayerControls : MonoBehaviour
     // Updates the state of the outline component on an object (if it has one, which selectable objects should)
     void UpdateOutlineOnObject(GameObject obj, bool isObjectSelected)
     {
+        if(obj == null)
+        {
+            DeselectAll();
+        }
         var outlineComponent = obj.GetComponent<Outline>();
         if(outlineComponent != null)
         {
@@ -259,9 +268,18 @@ public class PlayerControls : MonoBehaviour
 
     void SetSelectedEntityAttackTargets(IUnit target){
         foreach (GameObject entity in selectedObjects){
+            Debug.Log("Setting attack target...");
             WaypointHandler WH = entity.GetComponent<WaypointHandler>();
-            if (WH){
-                WH.entityController.SetAttackTarget(target);
+            if (WH && !ClientGameRunner.Instance.IsOurUnit(target.GetGameObject())){
+                if (WH.mode == WaypointHandlerMode.ONLINE)
+                {
+                    Debug.Log("Issued attack cmd");
+                    ClientGameRunner.Instance.IssueComand(entity.GetComponent<IUnit>(), target);
+                }
+                else
+                {
+                    WH.entityController.SetAttackTarget(target);
+                }
             }
         }
     }
@@ -270,7 +288,14 @@ public class PlayerControls : MonoBehaviour
         foreach (GameObject entity in selectedObjects){
             WaypointHandler WH = entity.GetComponent<WaypointHandler>();
             if (WH){
-                WH.entityController.ClearAttackTarget();
+                if (WH.mode == WaypointHandlerMode.ONLINE)
+                {
+                    ClientGameRunner.Instance.IssueComand(entity.GetComponent<IUnit>(), null);
+                }
+                else
+                {
+                    WH.entityController.ClearAttackTarget();
+                }
             }
         }
     }

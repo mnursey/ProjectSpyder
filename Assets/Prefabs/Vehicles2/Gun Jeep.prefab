@@ -532,6 +532,7 @@ GameObject:
   - component: {fileID: 5648534046795121572}
   - component: {fileID: 5648534046795121574}
   - component: {fileID: 5648534046795121573}
+  - component: {fileID: 3818463406887296146}
   m_Layer: 9
   m_Name: Gun Jeep
   m_TagString: Untagged
@@ -620,6 +621,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e472ef300c1cc5f478414dbba793580f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  controller: {fileID: 5648534046795121580}
   steeringInput: 0
   accelerationInput: 0
   brakingInput: 0
@@ -699,6 +701,7 @@ MonoBehaviour:
   waypointRadius: 10
   minWaypointAngleDelta: 15
   useRadiusArrivalDetection: 1
+  mode: 1
   waypointVerticalOffset: 1
   waypointDestinationMarkerHeight: 4.5
   waypointLineWidth: 0.15
@@ -709,7 +712,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5648534046795121577}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
   m_Name: 
@@ -720,6 +723,26 @@ MonoBehaviour:
   precomputeOutline: 0
   bakeKeys: []
   bakeValues: []
+--- !u!114 &3818463406887296146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5648534046795121577}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6681a6dd7407e744a82f230a6f1fcbdd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  originalPos: {x: 0, y: 0, z: 0}
+  originalRot: {x: 0, y: 0, z: 0, w: 0}
+  targetPos: {x: 0, y: 0, z: 0}
+  targetRot: {x: 0, y: 0, z: 0, w: 0}
+  originalFrame: 0
+  frame: 0
+  updateRate: 0
+  lerp: 0
 --- !u!1 &6756298480099555778
 GameObject:
   m_ObjectHideFlags: 0
