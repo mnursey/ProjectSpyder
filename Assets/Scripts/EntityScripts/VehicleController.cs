@@ -3,6 +3,7 @@ using UnityEditor;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class VehicleController : MonoBehaviour {
 
@@ -62,13 +63,21 @@ public class VehicleController : MonoBehaviour {
     	if(!inputs) inputs = GetComponent<VehicleAI>();
 
     	rb.centerOfMass = new Vector3(0, rb.centerOfMass.y + centerOfMassYOffset, (frontAxle.offset.x + rearAxle.offset.x)/2);
+
+        foreach (Slider s in GetComponentsInChildren<Slider>())
+        {
+            s.maxValue = HP;
+        }
     }
 
 	void Update(){
 		inputs.UpdateInputs();
 		collisionCooldown = Mathf.Max(0, collisionCooldown - Time.deltaTime);
 
-
+        foreach(Slider s in GetComponentsInChildren<Slider>())
+        {
+            s.value = HP;
+        }
 	}
 
 	public void Reset(){

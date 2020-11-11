@@ -123,7 +123,7 @@ MonoBehaviour:
   turretSpeed: 0
   HP: 1500
   gunDamage: 1000
-  gunRange: 100
+  gunRange: 250
   fireRate: 0.2
   gunForce: 600000
   gunExplosionRadius: 3
@@ -146,6 +146,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e472ef300c1cc5f478414dbba793580f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  controller: {fileID: 0}
   steeringInput: 0
   accelerationInput: 0
   brakingInput: 0
@@ -155,6 +156,7 @@ MonoBehaviour:
   accelPrudence: 1
   manualControl: 0
   atkStyle: 1
+  gunCooldown: 0
 --- !u!54 &1035869809270247467
 Rigidbody:
   m_ObjectHideFlags: 0

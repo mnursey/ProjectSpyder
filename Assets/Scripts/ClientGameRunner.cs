@@ -433,7 +433,7 @@ public class ClientGameRunner : MonoBehaviour
                     break;
 
                 case GameStateEnum.ENDING:
-                    MenuController.Instance.SetEndingText("Next game in " + Mathf.RoundToInt(incomingGameState.zoneSize) + " seconds");
+                    MenuController.Instance.SetEndingText("You won if you had fun!\n Did you win?\nNext game in " + Mathf.RoundToInt(incomingGameState.zoneSize) + " seconds");
                     break;
 
                 case GameStateEnum.PLAYING:
