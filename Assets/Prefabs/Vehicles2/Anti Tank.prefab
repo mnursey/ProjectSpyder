@@ -267,6 +267,8 @@ MonoBehaviour:
   - {x: 0, y: 3, z: 0}
   explosionParticlePrefab: {fileID: 6175209976648874569, guid: 5781acdcb1f992841acc365e74976e84,
     type: 3}
+  explosionAudioPrefab: {fileID: 6192604757798744974, guid: 536dc0d4169445e4ea2f94089ef9d41f,
+    type: 3}
 --- !u!1 &1503298921171223607
 GameObject:
   m_ObjectHideFlags: 0
