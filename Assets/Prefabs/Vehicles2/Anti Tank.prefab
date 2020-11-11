@@ -56,6 +56,7 @@ GameObject:
   - component: {fileID: 5625079708653448459}
   - component: {fileID: 1035869809270247510}
   - component: {fileID: 1035869809270247511}
+  - component: {fileID: 8765466651819912317}
   - component: {fileID: 4848064525237924848}
   m_Layer: 9
   m_Name: Anti Tank
@@ -246,6 +247,28 @@ MonoBehaviour:
   precomputeOutline: 0
   bakeKeys: []
   bakeValues: []
+--- !u!114 &8765466651819912317
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1035869809270247508}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4581b428bbb37145bfbe4b8f2cd1d3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  explosionForce: 1000
+  explosionRadius: 5
+  fragmentPrefabs:
+  - {fileID: 161010093129381138, guid: b6805915045527d43939f7485009aaa7, type: 3}
+  - {fileID: 581434141300310493, guid: 34de3f3365c8b2f45994a2760b87948c, type: 3}
+  fragmentPositionOffsets:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 3, z: 0}
+  explosionParticlePrefab: {fileID: 6175209976648874569, guid: 5781acdcb1f992841acc365e74976e84,
+    type: 3}
 --- !u!114 &4848064525237924848
 MonoBehaviour:
   m_ObjectHideFlags: 0

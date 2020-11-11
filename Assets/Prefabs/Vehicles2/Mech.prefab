@@ -1334,6 +1334,7 @@ GameObject:
   - component: {fileID: 7616323699062288964}
   - component: {fileID: 8282972475952327206}
   - component: {fileID: 8282972475952327228}
+  - component: {fileID: 1977240454082060840}
   - component: {fileID: 1496595442266795586}
   m_Layer: 9
   m_Name: Mech
@@ -1498,6 +1499,36 @@ MonoBehaviour:
   precomputeOutline: 0
   bakeKeys: []
   bakeValues: []
+--- !u!114 &1977240454082060840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7616323699062288965}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4581b428bbb37145bfbe4b8f2cd1d3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  explosionForce: 100
+  explosionRadius: 5
+  fragmentPrefabs:
+  - {fileID: 6653165734089062153, guid: 47fc72232fe8c504d9fad6460197c23f, type: 3}
+  - {fileID: 4209981278450378664, guid: 3bef56f3b9c061b48980edd6f81198e7, type: 3}
+  - {fileID: 5719521673688250987, guid: a3dae740c5fc329449456f8043bf221c, type: 3}
+  - {fileID: 1647189239464736812, guid: c98aa609300edd944b44b44270f12b0b, type: 3}
+  - {fileID: 8617459069032104447, guid: dcf353e65334bcd43b58b60dab8eab25, type: 3}
+  - {fileID: 1048020022284277887, guid: a97f412c4232f71478f2341120011ae1, type: 3}
+  fragmentPositionOffsets:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  explosionParticlePrefab: {fileID: 6175209976648874569, guid: 5781acdcb1f992841acc365e74976e84,
+    type: 3}
 --- !u!114 &1496595442266795586
 MonoBehaviour:
   m_ObjectHideFlags: 0
