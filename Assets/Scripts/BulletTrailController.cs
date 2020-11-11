@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditorInternal;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Rendering;
 
 public class BulletTrailController : MonoBehaviour
@@ -45,6 +42,9 @@ public class BulletTrailController : MonoBehaviour
     float iterationsToHit;
     int currentIteration = 1;
     bool hit = false;
+
+    // Audio
+    public AudioSource audioSource;
 
     private void Awake()
     {
@@ -97,6 +97,8 @@ public class BulletTrailController : MonoBehaviour
             pRenderer.trailMaterial = trailMaterial;
             pRenderer.shadowCastingMode = pShadowCastingMode;
         }
+
+        audioSource = GetComponent<AudioSource>();
     }
 
 
@@ -124,6 +126,7 @@ public class BulletTrailController : MonoBehaviour
             if (!hit)
             {
                 Instantiate(particleHitPrefab, endPos, Quaternion.identity);
+                audioSource.Play();
                 transform.position = endPos;
                 hit = true;
                 Destroy(gameObject, objDestroyDelayAfterHit);

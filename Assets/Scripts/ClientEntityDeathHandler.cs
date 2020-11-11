@@ -15,6 +15,7 @@ public class ClientEntityDeathHandler : MonoBehaviour
     public float explosionRadius = 5.0f;
     public List<GameObject> fragmentPrefabs;
     public List<Vector3> fragmentPositionOffsets;
+    public GameObject explosionParticlePrefab;
 
     // Start is called before the first frame update
     void Start()
@@ -67,6 +68,10 @@ public class ClientEntityDeathHandler : MonoBehaviour
                         Debug.LogError("OH NOOOO");
                     }
                     fragObj.GetComponent<Rigidbody>().AddExplosionForce(explosionForce, explosionForceOrigin, explosionRadius);
+                    if(explosionParticlePrefab != null)
+                    {
+                        Instantiate(explosionParticlePrefab, vehiclePosition, Quaternion.identity);
+                    }
                 }
                 else
                 {

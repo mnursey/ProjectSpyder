@@ -265,6 +265,8 @@ MonoBehaviour:
   fragmentPositionOffsets:
   - {x: 0, y: 0, z: 0}
   - {x: 0, y: 3, z: 0}
+  explosionParticlePrefab: {fileID: 6175209976648874569, guid: 5781acdcb1f992841acc365e74976e84,
+    type: 3}
 --- !u!1 &1503298921171223607
 GameObject:
   m_ObjectHideFlags: 0

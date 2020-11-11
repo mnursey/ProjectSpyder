@@ -618,6 +618,8 @@ MonoBehaviour:
   - {x: 0, y: 0, z: 0}
   - {x: 0, y: 0, z: 0}
   - {x: 0, y: 0, z: 0}
+  explosionParticlePrefab: {fileID: 6175209976648874569, guid: 5781acdcb1f992841acc365e74976e84,
+    type: 3}
 --- !u!1 &4275048357442972184
 GameObject:
   m_ObjectHideFlags: 0
