@@ -25,6 +25,8 @@ public class ServerGameRunner : MonoBehaviour
 
     public static ServerGameRunner Instance;
 
+    public List<GameObject> spawnPositions = new List<GameObject>();
+
     private void Awake()
     {
         if(Instance == null)
@@ -157,9 +159,11 @@ public class ServerGameRunner : MonoBehaviour
         state = GameStateEnum.PLAYING;
 
         // For all players spawn units
+        int i = 0;
         foreach(Player p in pm.players)
         {
-            SpawnInitialEntities(p);
+            SpawnInitialEntities(p, i % spawnPositions.Count);
+            ++i;
         }
 
         kzc.Init_Server(zoneMaxSize, 0.0f, 1, zoneCloseRate);
@@ -180,7 +184,7 @@ public class ServerGameRunner : MonoBehaviour
         timer = endTime;
     }
 
-    void SpawnInitialEntities(Player p)
+    void SpawnInitialEntities(Player p, int spawnPos)
     {
         for(int i = 0; i < 5; ++i)
         {
@@ -189,8 +193,7 @@ public class ServerGameRunner : MonoBehaviour
             IEntity e = em.CreateEntity(EntityType.MG_JEEP);
             p.controlledEntities.Add(e.id);
 
-            // TODO Set positions of units to a spawn position
-            e.gameObject.transform.position = new Vector3(i * 10f, 30f, 0f);
+            e.gameObject.transform.position = spawnPositions[spawnPos].transform.position + new Vector3(i * 3f, 0f, 0f);
         }
     }
 

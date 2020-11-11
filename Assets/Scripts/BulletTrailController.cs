@@ -109,6 +109,9 @@ public class BulletTrailController : MonoBehaviour
         endPos = end;
         float distance = Vector3.Distance(begin, end);
         iterationsToHit = distance / bulletSpeed;
+
+        Quaternion rotation = Quaternion.LookRotation(Vector3.RotateTowards(Vector3.forward, (end - begin), Mathf.PI * 2, 1));
+        transform.rotation = rotation;
     }
 
 

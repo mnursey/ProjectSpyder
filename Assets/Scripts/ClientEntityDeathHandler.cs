@@ -32,6 +32,15 @@ public class ClientEntityDeathHandler : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(ClientGameRunner.Instance != null)
+        {
+            if(ClientGameRunner.Instance.em.GetEntity(this.gameObject).health <= 0 && !isDestroyed)
+            {
+                isDestroyed = true;
+                Destroy();
+            }
+        }
+        /*
         //if(gameRunner != null)
         //{
             //if(gameRunner.em.getentity(gameobject).health <= 0)
@@ -40,7 +49,7 @@ public class ClientEntityDeathHandler : MonoBehaviour
             isDestroyed = true;
             Destroy();
         }
-        //}
+        //} */
     }
 
 

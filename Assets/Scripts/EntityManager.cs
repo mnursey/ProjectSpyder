@@ -19,6 +19,9 @@ public class EntityManager : MonoBehaviour
 
     public EntityManagerMode mode;
 
+    public GameObject bulletPrefab1;
+    public GameObject bulletPrefab2;
+
     public void Awake()
     {
         if(Instance == null)
@@ -179,12 +182,6 @@ public class EntityManager : MonoBehaviour
             IUnit unit = e.gameObject.GetComponent<IUnit>();
             if(unit != null)
             {
-                if(es.shot)
-                {
-                    // TODO
-                    // IF SHOT THIS FRAME SPAWN SHOOTING VISUALS
-                }
-
                 // Update unit health 
                 e.gameObject.GetComponent<VehicleController>().HP = e.health;
 
@@ -197,6 +194,26 @@ public class EntityManager : MonoBehaviour
                     if(targetUniit != null)
                     {
                         unit.SetAttackTarget(targetUniit);
+                    }
+
+                    if (es.shot)
+                    {
+                        // TODO REFACTOR THIS
+                        if(unit.GetGameObject().GetComponent<VehicleAI>().atkStyle == AttackStyle.FixedGun)
+                        {
+                            // IF SHOT THIS FRAME SPAWN SHOOTING VISUALS
+                            GameObject bullet = Instantiate(bulletPrefab1, e.gameObject.transform.position, Quaternion.identity);
+                            BulletTrailController btc = bullet.GetComponent<BulletTrailController>();
+                            btc.Init(e.gameObject.transform.position, attackTarget.gameObject.transform.position);
+                        }
+
+                        if(unit.GetGameObject().GetComponent<VehicleAI>().atkStyle == AttackStyle.TurretGun)
+                        {
+                            // IF SHOT THIS FRAME SPAWN SHOOTING VISUALS
+                            GameObject bullet = Instantiate(bulletPrefab2, e.gameObject.transform.position, Quaternion.identity);
+                            BulletTrailController btc = bullet.GetComponent<BulletTrailController>();
+                            btc.Init(e.gameObject.transform.position, attackTarget.gameObject.transform.position);
+                        }
                     }
                 }
             }
