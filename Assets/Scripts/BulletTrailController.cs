@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Rendering;
 
 public class BulletTrailController : MonoBehaviour
@@ -44,7 +45,10 @@ public class BulletTrailController : MonoBehaviour
     bool hit = false;
 
     // Audio
-    public AudioSource audioSource;
+    public List<AudioClip> shotClips;
+    public AudioSource shotSource;
+    public List<AudioClip> hitClips;
+    public AudioSource hitSource;
 
     private void Awake()
     {
@@ -97,8 +101,6 @@ public class BulletTrailController : MonoBehaviour
             pRenderer.trailMaterial = trailMaterial;
             pRenderer.shadowCastingMode = pShadowCastingMode;
         }
-
-        audioSource = GetComponent<AudioSource>();
     }
 
 
@@ -112,6 +114,21 @@ public class BulletTrailController : MonoBehaviour
 
         Quaternion rotation = Quaternion.LookRotation(Vector3.RotateTowards(Vector3.forward, (end - begin), Mathf.PI * 2, 1));
         transform.rotation = rotation;
+    }
+
+
+    private void Start()
+    {
+        if (shotSource != null)
+        {
+            int shotClipIndex = Mathf.FloorToInt(Random.Range(0, shotClips.Count));
+            shotSource.clip = shotClips[shotClipIndex];
+            shotSource.Play();
+        }
+        else
+        {
+            Debug.LogError("No shot or hit source found! Assign in editor");
+        }
     }
 
 
@@ -129,12 +146,26 @@ public class BulletTrailController : MonoBehaviour
             if (!hit)
             {
                 Instantiate(particleHitPrefab, endPos, Quaternion.identity);
-                audioSource.Play();
                 transform.position = endPos;
+                PlayHitSound();
                 hit = true;
                 Destroy(gameObject, objDestroyDelayAfterHit);
             }
         }
         currentIteration++;
+    }
+
+    private void PlayHitSound()
+    {
+        if (hitSource != null)
+        {
+            int hitClipIndex = Mathf.FloorToInt(Random.Range(0, hitClips.Count));
+            hitSource.clip = hitClips[hitClipIndex];
+            hitSource.Play();
+        }
+        else
+        {
+            Debug.LogError("No hit source found! Assign in editor");
+        }
     }
 }

@@ -16,6 +16,7 @@ public class ClientEntityDeathHandler : MonoBehaviour
     public List<GameObject> fragmentPrefabs;
     public List<Vector3> fragmentPositionOffsets;
     public GameObject explosionParticlePrefab;
+    public GameObject explosionAudioPrefab;
 
     // Start is called before the first frame update
     void Start()
@@ -72,14 +73,14 @@ public class ClientEntityDeathHandler : MonoBehaviour
                     Vector3 prefabSpawnPosition = vehiclePosition + fragmentPositionOffsets[i];
                     Vector3 explosionForceOrigin = vehiclePosition + new Vector3(0.0f, -1.0f, 0.0f);
                     GameObject fragObj = Instantiate(fragmentPrefabs[i], prefabSpawnPosition, transform.rotation);
-                    if(fragObj == null)
-                    {
-                        Debug.LogError("OH NOOOO");
-                    }
                     fragObj.GetComponent<Rigidbody>().AddExplosionForce(explosionForce, explosionForceOrigin, explosionRadius);
-                    if(explosionParticlePrefab != null)
+                    if (explosionParticlePrefab != null)
                     {
                         Instantiate(explosionParticlePrefab, vehiclePosition, Quaternion.identity);
+                    }
+                    if(explosionAudioPrefab != null)
+                    {
+                        Instantiate(explosionAudioPrefab, vehiclePosition, Quaternion.identity);
                     }
                 }
                 else

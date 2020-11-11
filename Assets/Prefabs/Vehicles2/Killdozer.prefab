@@ -280,6 +280,8 @@ MonoBehaviour:
   fragmentPositionOffsets: []
   explosionParticlePrefab: {fileID: 6175209976648874569, guid: 5781acdcb1f992841acc365e74976e84,
     type: 3}
+  explosionAudioPrefab: {fileID: 6192604757798744974, guid: 536dc0d4169445e4ea2f94089ef9d41f,
+    type: 3}
 --- !u!114 &-7208610031814489938
 MonoBehaviour:
   m_ObjectHideFlags: 0
